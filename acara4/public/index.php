@@ -18,6 +18,7 @@ $mahasiswa = [
 	new Mahasiswa('230002', 'Siti Rahma', 'Manajemen Informatika'),
 	new Mahasiswa('230003', 'Budi Santoso', 'Teknik Komputer'),
 	new Mahasiswa('260004', 'Ani Pratiwi', 'Teknik Informatika'),
+	new Mahasiswa('260005', 'Rudi Hartono', 'Sistem Informasi'),
 ];
 
 $title = 'Data Mahasiswa | SI Akademik';
