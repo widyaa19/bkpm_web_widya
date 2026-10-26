@@ -1,0 +1,355 @@
+{
+  "info": {
+    "_postman_id": "0c1ed516-6ecf-4d70-9788-593ad7b89cc0",
+    "name": "API Sistem Informasi Akademik (MVC)",
+    "description": "Collection API MVC Sistem Informasi Akademik. Pilih environment Local atau Staging sebelum menjalankan request.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "http://localhost/bkpm_web/acara19/public"
+    },
+    {
+      "key": "mahasiswaId",
+      "value": "1"
+    },
+    {
+      "key": "testNim",
+      "value": "23016001"
+    }
+  ],
+  "item": [
+    {
+      "name": "GET - Semua mahasiswa",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{base_url}}/api/mahasiswa"
+      }
+    },
+    {
+      "name": "GET - Mahasiswa berdasarkan ID",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{base_url}}/api/mahasiswa?id={{mahasiswaId}}"
+      }
+    },
+    {
+      "name": "POST - Tambah mahasiswa",
+      "event": [
+        {
+          "listen": "prerequest",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.collectionVariables.set('testNim', '16' + Date.now().toString());"
+            ]
+          }
+        },
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Status 201 Created', function () { pm.response.to.have.status(201); });",
+              "if (pm.response.code === 201) {",
+              "    const body = pm.response.json();",
+              "    pm.collectionVariables.set('mahasiswaId', body.data.id);",
+              "}"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"nim\": \"{{testNim}}\",\n  \"nama\": \"Dewi\",\n  \"email\": \"dewi@example.com\",\n  \"prodi_id\": 1,\n  \"angkatan\": 2023,\n  \"status\": \"aktif\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": "{{base_url}}/api/mahasiswa"
+      }
+    },
+    {
+      "name": "PUT - Ubah mahasiswa",
+      "request": {
+        "method": "PUT",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"nim\": \"{{testNim}}\",\n  \"nama\": \"Dewi Santoso\",\n  \"email\": \"dewi.santoso@example.com\",\n  \"prodi_id\": 1,\n  \"angkatan\": 2023,\n  \"status\": \"aktif\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": "{{base_url}}/api/mahasiswa?id={{mahasiswaId}}"
+      }
+    },
+    {
+      "name": "DELETE - Hapus mahasiswa",
+      "request": {
+        "method": "DELETE",
+        "header": [],
+        "url": "{{base_url}}/api/mahasiswa?id={{mahasiswaId}}"
+      }
+    },
+    {
+      "name": "GET - ID tidak ditemukan (404)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Status 404 Not Found', function () { pm.response.to.have.status(404); });",
+              "pm.test('Response menyatakan gagal', function () { pm.expect(pm.response.json().success).to.eql(false); });"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{base_url}}/api/mahasiswa/999999"
+      }
+    },
+    {
+      "name": "POST - NIM kosong (400)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Status 400 Bad Request', function () { pm.response.to.have.status(400); });",
+              "pm.test('Response berisi rincian validasi', function () { pm.expect(pm.response.json().errors).to.be.an('array').that.is.not.empty; });"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"nim\": \"\",\n  \"nama\": \"Dewi\",\n  \"email\": \"dewi@example.com\",\n  \"prodi_id\": 1,\n  \"angkatan\": 2023\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": "{{base_url}}/api/mahasiswa"
+      }
+    },
+    {
+      "name": "POST - Email tidak valid (400)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Status 400 Bad Request', function () { pm.response.to.have.status(400); });",
+              "pm.test('Response berisi rincian validasi', function () { pm.expect(pm.response.json().errors).to.be.an('array').that.is.not.empty; });"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"nim\": \"23016002\",\n  \"nama\": \"Dewi\",\n  \"email\": \"email-tidak-valid\",\n  \"prodi_id\": 1,\n  \"angkatan\": 2023\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": "{{base_url}}/api/mahasiswa"
+      }
+    },
+    {
+      "name": "POST - Data JSON tidak lengkap (400)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Status 400 Bad Request', function () { pm.response.to.have.status(400); });",
+              "pm.test('Response berisi rincian validasi', function () { pm.expect(pm.response.json().errors).to.be.an('array').that.is.not.empty; });"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"nim\": \"23016003\",\n  \"nama\": \"Dewi\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": "{{base_url}}/api/mahasiswa"
+      }
+    },
+    {
+      "name": "POST - Registrasi user berhasil",
+      "event": [
+        {
+          "listen": "prerequest",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "const unique = Date.now().toString();",
+              "pm.variables.set('registerUsername', 'user_' + unique);",
+              "pm.variables.set('registerEmail', 'user_' + unique + '@example.com');"
+            ]
+          }
+        },
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Status 201 Created', function () { pm.response.to.have.status(201); });",
+              "pm.test('Registrasi berhasil', function () { pm.expect(pm.response.json().success).to.eql(true); });"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"username\": \"{{registerUsername}}\",\n  \"email\": \"{{registerEmail}}\",\n  \"password\": \"password123\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": "{{base_url}}/register"
+      },
+      "response": [
+        {
+          "name": "201 Created - Registrasi berhasil",
+          "originalRequest": {
+            "method": "POST",
+            "url": "{{base_url}}/register"
+          },
+          "status": "Created",
+          "code": 201,
+          "_postman_previewlanguage": "json",
+          "header": [
+            {
+              "key": "Content-Type",
+              "value": "application/json; charset=utf-8"
+            }
+          ],
+          "body": "{\n  \"success\": true,\n  \"message\": \"Registrasi berhasil.\",\n  \"data\": { \"id\": \"1\" },\n  \"errors\": [],\n  \"timestamp\": \"2026-10-24T08:00:00+00:00\"\n}"
+        }
+      ]
+    },
+    {
+      "name": "POST - Registrasi email tidak valid (422)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Status 422 Unprocessable Entity', function () { pm.response.to.have.status(422); });",
+              "pm.test('Registrasi ditolak', function () { pm.expect(pm.response.json().success).to.eql(false); });"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"username\": \"user_email_invalid\",\n  \"email\": \"email-tidak-valid\",\n  \"password\": \"password123\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": "{{base_url}}/register"
+      },
+      "response": [
+        {
+          "name": "422 Unprocessable Entity - Email tidak valid",
+          "originalRequest": {
+            "method": "POST",
+            "url": "{{base_url}}/register"
+          },
+          "status": "Unprocessable Entity",
+          "code": 422,
+          "_postman_previewlanguage": "json",
+          "header": [
+            {
+              "key": "Content-Type",
+              "value": "application/json; charset=utf-8"
+            }
+          ],
+          "body": "{\n  \"success\": false,\n  \"message\": \"Email wajib berupa alamat email valid dan maksimal 100 karakter.\",\n  \"data\": null,\n  \"errors\": [],\n  \"timestamp\": \"2026-10-24T08:00:00+00:00\"\n}"
+        }
+      ]
+    }
+  ]
+}
