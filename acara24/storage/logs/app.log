@@ -1,0 +1,14 @@
+2026-10-24 09:23:37 [Web register] PDOException: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'si_akademik.users' doesn't exist in C:\laragon\www\bkpm_web\acara19\app\Models\User.php:27
+#0 C:\laragon\www\bkpm_web\acara19\app\Models\User.php(27): PDO->prepare('INSERT INTO use...')
+#1 C:\laragon\www\bkpm_web\acara19\app\Controllers\AuthController.php(168): App\Models\User->create(Array)
+#2 C:\laragon\www\bkpm_web\acara19\app\Controllers\AuthController.php(81): App\Controllers\AuthController->registerFromForm()
+#3 C:\laragon\www\bkpm_web\acara19\app\Core\Router.php(52): App\Controllers\AuthController->register()
+#4 C:\laragon\www\bkpm_web\acara19\public\index.php(12): App\Core\Router->dispatch(Array)
+#5 {main}
+2026-10-24 09:24:19 [Web register] PDOException: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'si_akademik.users' doesn't exist in C:\laragon\www\bkpm_web\acara19\app\Models\User.php:27
+#0 C:\laragon\www\bkpm_web\acara19\app\Models\User.php(27): PDO->prepare('INSERT INTO use...')
+#1 C:\laragon\www\bkpm_web\acara19\app\Controllers\AuthController.php(168): App\Models\User->create(Array)
+#2 C:\laragon\www\bkpm_web\acara19\app\Controllers\AuthController.php(81): App\Controllers\AuthController->registerFromForm()
+#3 C:\laragon\www\bkpm_web\acara19\app\Core\Router.php(52): App\Controllers\AuthController->register()
+#4 C:\laragon\www\bkpm_web\acara19\public\index.php(12): App\Core\Router->dispatch(Array)
+#5 {main}
