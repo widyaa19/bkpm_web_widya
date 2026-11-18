@@ -48,13 +48,13 @@
         <span id="jumlah-hasil" class="result-count" aria-live="polite">Menunggu data</span>
       </div>
     </div>
-    <form id="form-mahasiswa" class="student-form" hidden>
+    <form id="form-mahasiswa" class="student-form" enctype="multipart/form-data" hidden>
       <h3 id="judul-form-mahasiswa">Tambah mahasiswa</h3>
       <input id="mahasiswa-id" name="id" type="hidden">
       <div class="student-form-grid">
         <label>NIM<input name="nim" required maxlength="9" pattern="[0-9]{9}" inputmode="numeric"></label>
         <label>Nama<input name="nama" required maxlength="100"></label>
-        <label>Foto<input name="foto" type="file" accept=".jpg,.jpeg,.png,image/jpeg,image/png"></label>
+        <?php include __DIR__ . '/partials/photo-upload.php'; ?>
         <label>Email<input name="email" type="email" required maxlength="100"></label>
         <label>ID program studi<input name="prodi_id" type="number" min="1" required></label>
         <label>Angkatan<input name="angkatan" type="number" min="1900" max="2155" required></label>

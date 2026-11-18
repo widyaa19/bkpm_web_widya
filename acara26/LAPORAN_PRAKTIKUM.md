@@ -161,3 +161,13 @@ Dokumentasi kontrak endpoint, controller, autentikasi, request body, dan contoh 
 5. Jalankan request untuk memperoleh response aktual. Simpan bukti dengan screenshot request dan response sukses/gagal, lalu lampirkan pada laporan. Contoh response dan status HTTP yang diharapkan ada di [`docs/API_DOCUMENTATION.md`](./docs/API_DOCUMENTATION.md).
 
 Thunder Client tidak mengikuti fitur Postman **Examples → View Documentation** pada prosedur praktikum. Karena itu, dokumentasi endpoint tertulis dan screenshot Thunder Client menjadi lampiran pengganti; jangan mencantumkan URL View Documentation yang tidak dibuat.
+
+## Tugas Praktik Mandiri — Foto dan backup basis data
+
+### Penghapusan foto lama
+
+Pada alur dashboard di proyek ini, proses pembaruan foto dijalankan oleh `ApiMahasiswaController::update()`, bukan `MahasiswaController::update()`. Setelah data berhasil diperbarui dan foto baru diunggah, foto lama dihapus melalui `removePhoto()` dengan `unlink()`. Jika upload atau validasi gagal, foto lama tetap dipertahankan.
+
+### Jadwal backup
+
+Lakukan backup basis data `si_akademik` pada akhir **setiap sesi praktikum**, sebelum menghentikan MySQL. Di phpMyAdmin, pilih database `si_akademik` → **Export** → **Quick** → format **SQL** → **Export**. Simpan hasilnya dengan nama bertanggal, misalnya `si_akademik_2026-11-17.sql`, di folder backup lokal di luar `public/`. Setelah ekspor, pastikan berkas SQL tersimpan dan ukurannya tidak nol.

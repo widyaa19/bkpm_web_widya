@@ -25,6 +25,11 @@ async function muatDataMahasiswa() {
   const statActive = dashboard.querySelector('#jumlah-aktif');
   const form = dashboard.querySelector('#form-mahasiswa');
   const formTitle = dashboard.querySelector('#judul-form-mahasiswa');
+  const photoInput = form.elements.namedItem('foto');
+  const photoPreviewContainer = dashboard.querySelector('#foto-preview-container');
+  const photoPreview = dashboard.querySelector('#foto-preview');
+  const photoPreviewLabel = dashboard.querySelector('#foto-preview-label');
+  let selectedPhotoUrl = null;
   let mahasiswaList = [];
 
   document.querySelectorAll('a[href$="/logout"]').forEach((logoutLink) => {
@@ -108,6 +113,35 @@ async function muatDataMahasiswa() {
     });
   }
 
+  function showPhotoPreview(file = null, filename = '') {
+    if (selectedPhotoUrl) {
+      URL.revokeObjectURL(selectedPhotoUrl);
+      selectedPhotoUrl = null;
+    }
+
+    if (file) {
+      selectedPhotoUrl = URL.createObjectURL(file);
+      photoPreview.src = selectedPhotoUrl;
+      photoPreview.alt = `Pratinjau ${file.name}`;
+      photoPreviewLabel.textContent = file.name;
+      photoPreviewContainer.hidden = false;
+      return;
+    }
+
+    if (filename) {
+      photoPreview.src = `${dashboard.dataset.uploadUrl}${encodeURIComponent(filename)}`;
+      photoPreview.alt = 'Foto mahasiswa saat ini';
+      photoPreviewLabel.textContent = 'Foto saat ini';
+      photoPreviewContainer.hidden = false;
+      return;
+    }
+
+    photoPreview.removeAttribute('src');
+    photoPreview.alt = '';
+    photoPreviewLabel.textContent = '';
+    photoPreviewContainer.hidden = true;
+  }
+
   function setFormValues(mahasiswa = {}) {
     form.elements.namedItem('id').value = mahasiswa.id ?? '';
     form.elements.namedItem('nim').value = mahasiswa.nim ?? '';
@@ -116,6 +150,8 @@ async function muatDataMahasiswa() {
     form.elements.namedItem('prodi_id').value = mahasiswa.prodi_id ?? '';
     form.elements.namedItem('angkatan').value = mahasiswa.angkatan ?? '';
     form.elements.namedItem('status').value = mahasiswa.status ?? 'aktif';
+    photoInput.value = '';
+    showPhotoPreview(null, mahasiswa.foto ?? '');
   }
 
   async function sendMutation(url, method, data) {
@@ -148,6 +184,11 @@ async function muatDataMahasiswa() {
   dashboard.querySelector('#batal-form-mahasiswa').addEventListener('click', () => {
     form.reset();
     form.hidden = true;
+    showPhotoPreview();
+  });
+
+  photoInput.addEventListener('change', () => {
+    showPhotoPreview(photoInput.files[0] ?? null);
   });
 
   form.addEventListener('submit', async (event) => {
@@ -167,6 +208,7 @@ async function muatDataMahasiswa() {
       );
       form.reset();
       form.hidden = true;
+      showPhotoPreview();
       await refreshMahasiswa();
       setStatus(result.message, 'success');
     } catch (error) {

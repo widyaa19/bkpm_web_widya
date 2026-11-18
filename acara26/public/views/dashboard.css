@@ -162,6 +162,48 @@
   font-weight: 700;
 }
 
+.photo-upload {
+  display: grid;
+  align-content: start;
+  gap: 0.35rem;
+  color: var(--academic-muted);
+  font-size: 0.78rem;
+  font-weight: 700;
+}
+
+.photo-upload input {
+  width: 100%;
+  min-height: 40px;
+  padding: 0.35rem;
+  border: 1px solid #bdcecc;
+  border-radius: 3px;
+  background: var(--academic-surface);
+  color: var(--academic-ink);
+  font: inherit;
+}
+
+.photo-upload small {
+  font-size: 0.7rem;
+  font-weight: 400;
+}
+
+.photo-preview {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  color: var(--academic-ink);
+}
+
+.photo-preview[hidden] {
+  display: none;
+}
+
+.photo-preview img {
+  border: 1px solid var(--academic-line);
+  border-radius: 3px;
+  object-fit: cover;
+}
+
 .student-form-grid input,
 .student-form-grid select {
   width: 100%;
