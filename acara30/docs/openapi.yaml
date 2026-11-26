@@ -1,0 +1,807 @@
+openapi: 3.0.0
+info:
+  title: API Sistem Informasi Akademik (MVC)
+  version: 1.0.0
+  description: >-
+    Dokumentasi endpoint REST API Sistem Informasi Akademik. Endpoint tulis
+    mahasiswa membutuhkan JWT yang diperoleh melalui endpoint login. Semua
+    endpoint API mengembalikan response JSON dengan envelope yang konsisten.
+servers:
+  - url: https://alwiyaa.my.id/Widya/public
+    description: Server produksi
+  - url: http://localhost/bkpm_web/acara30/public
+    description: Server lokal Laragon
+tags:
+  - name: Autentikasi
+  - name: Mahasiswa
+  - name: Buku
+paths:
+  /register:
+    post:
+      tags:
+        - Autentikasi
+      summary: Mendaftarkan akun pengguna
+      description: Membuat akun baru dengan role user. Endpoint menerima JSON.
+      operationId: registerUser
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RegisterRequest'
+            example:
+              username: mahasiswa
+              email: mahasiswa@example.com
+              password: password123
+      responses:
+        '201':
+          description: Registrasi berhasil.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+        '400':
+          description: JSON tidak valid atau field wajib tidak diisi.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+        '409':
+          description: Username atau email sudah terdaftar.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+        '415':
+          description: Content-Type bukan application/json.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+        '422':
+          description: Data akun tidak memenuhi validasi.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+  /login:
+    post:
+      tags:
+        - Autentikasi
+      summary: Autentikasi pengguna dan mendapatkan JWT
+      operationId: loginUser
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginRequest'
+            example:
+              username: mahasiswa
+              password: password123
+      responses:
+        '200':
+          description: Login berhasil. Token berlaku selama lima menit.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LoginResponse'
+        '400':
+          description: JSON tidak valid atau username/password tidak diisi.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+        '401':
+          description: Kredensial tidak valid.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+  /api/mahasiswa:
+    get:
+      tags:
+        - Mahasiswa
+      summary: Mengambil seluruh data mahasiswa atau satu mahasiswa berdasarkan ID
+      operationId: getMahasiswa
+      parameters:
+        - $ref: '#/components/parameters/QueryId'
+      responses:
+        '200':
+          description: Data berhasil diambil.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+        '400':
+          description: ID bukan bilangan bulat positif.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+        '404':
+          description: Data mahasiswa tidak ditemukan.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+    post:
+      tags:
+        - Mahasiswa
+      summary: Menambahkan data mahasiswa
+      operationId: createMahasiswa
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MahasiswaRequest'
+            example:
+              nim: '230160001'
+              nama: Dewi
+              email: dewi@example.com
+              prodi_id: 1
+              angkatan: 2023
+              status: aktif
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/MahasiswaMultipartRequest'
+      responses:
+        '201':
+          description: Data mahasiswa berhasil ditambahkan.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '415':
+          $ref: '#/components/responses/UnsupportedMediaType'
+        '422':
+          description: Format NIM atau data mahasiswa tidak valid.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+    put:
+      tags:
+        - Mahasiswa
+      summary: Memperbarui seluruh data mahasiswa berdasarkan query ID
+      operationId: updateMahasiswaByQueryId
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/RequiredQueryId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MahasiswaRequest'
+      responses:
+        '200':
+          description: Data mahasiswa berhasil diperbarui.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          description: Data mahasiswa tidak ditemukan.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+        '415':
+          $ref: '#/components/responses/UnsupportedMediaType'
+        '422':
+          description: Format NIM atau data mahasiswa tidak valid.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+    delete:
+      tags:
+        - Mahasiswa
+      summary: Menghapus data mahasiswa berdasarkan query ID
+      operationId: deleteMahasiswaByQueryId
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/RequiredQueryId'
+      responses:
+        '200':
+          description: Data mahasiswa berhasil dihapus.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          description: Data mahasiswa tidak ditemukan.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+  /api/mahasiswa/{id}:
+    parameters:
+      - $ref: '#/components/parameters/PathId'
+    get:
+      tags:
+        - Mahasiswa
+      summary: Mengambil satu mahasiswa berdasarkan ID
+      operationId: getMahasiswaById
+      responses:
+        '200':
+          description: Data berhasil diambil.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          description: Data mahasiswa tidak ditemukan.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+    post:
+      tags:
+        - Mahasiswa
+      summary: Memperbarui data mahasiswa dengan multipart
+      operationId: updateMahasiswaMultipartById
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/MahasiswaMultipartRequest'
+      responses:
+        '200':
+          description: Data mahasiswa berhasil diperbarui.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          description: Data mahasiswa tidak ditemukan.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+        '422':
+          description: Data atau foto mahasiswa tidak valid.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+    put:
+      tags:
+        - Mahasiswa
+      summary: Memperbarui seluruh data mahasiswa berdasarkan path ID
+      operationId: updateMahasiswaById
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MahasiswaRequest'
+      responses:
+        '200':
+          description: Data mahasiswa berhasil diperbarui.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          description: Data mahasiswa tidak ditemukan.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+        '415':
+          $ref: '#/components/responses/UnsupportedMediaType'
+        '422':
+          description: Format NIM atau data mahasiswa tidak valid.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+    delete:
+      tags:
+        - Mahasiswa
+      summary: Menghapus data mahasiswa berdasarkan path ID
+      operationId: deleteMahasiswaById
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Data mahasiswa berhasil dihapus.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          description: Data mahasiswa tidak ditemukan.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+  /api/buku:
+    get:
+      tags:
+        - Buku
+      summary: Mengambil seluruh data buku atau satu buku berdasarkan ID
+      operationId: getBuku
+      parameters:
+        - $ref: '#/components/parameters/QueryId'
+      responses:
+        '200':
+          description: Data buku berhasil diambil.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          description: Data buku tidak ditemukan.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+    post:
+      tags:
+        - Buku
+      summary: Menambahkan data buku
+      operationId: createBuku
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BukuRequest'
+            example:
+              judul: Pemrograman Web
+              penulis: Dewi
+              penerbit: Penerbit Kampus
+              tahun_terbit: 2024
+              stok: 10
+      responses:
+        '201':
+          description: Data buku berhasil ditambahkan.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '415':
+          $ref: '#/components/responses/UnsupportedMediaType'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+    put:
+      tags:
+        - Buku
+      summary: Memperbarui data buku berdasarkan query ID
+      operationId: updateBukuByQueryId
+      parameters:
+        - $ref: '#/components/parameters/RequiredQueryId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BukuRequest'
+      responses:
+        '200':
+          description: Data buku berhasil diperbarui.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          description: Data buku tidak ditemukan.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+        '415':
+          $ref: '#/components/responses/UnsupportedMediaType'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+    delete:
+      tags:
+        - Buku
+      summary: Menghapus data buku berdasarkan query ID
+      operationId: deleteBukuByQueryId
+      parameters:
+        - $ref: '#/components/parameters/RequiredQueryId'
+      responses:
+        '200':
+          description: Data buku berhasil dihapus.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          description: Data buku tidak ditemukan.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+  /api/buku/{id}:
+    parameters:
+      - $ref: '#/components/parameters/PathId'
+    get:
+      tags:
+        - Buku
+      summary: Mengambil satu buku berdasarkan ID
+      operationId: getBukuById
+      responses:
+        '200':
+          description: Data buku berhasil diambil.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          description: Data buku tidak ditemukan.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+    put:
+      tags:
+        - Buku
+      summary: Memperbarui data buku berdasarkan path ID
+      operationId: updateBukuById
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BukuRequest'
+      responses:
+        '200':
+          description: Data buku berhasil diperbarui.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          description: Data buku tidak ditemukan.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+        '415':
+          $ref: '#/components/responses/UnsupportedMediaType'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+    delete:
+      tags:
+        - Buku
+      summary: Menghapus data buku berdasarkan path ID
+      operationId: deleteBukuById
+      responses:
+        '200':
+          description: Data buku berhasil dihapus.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          description: Data buku tidak ditemukan.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+  parameters:
+    PathId:
+      name: id
+      in: path
+      required: true
+      description: ID resource berupa bilangan bulat positif.
+      schema:
+        type: integer
+        minimum: 1
+    QueryId:
+      name: id
+      in: query
+      required: false
+      description: Jika diberikan, ambil satu resource berdasarkan ID positif.
+      schema:
+        type: integer
+        minimum: 1
+    RequiredQueryId:
+      name: id
+      in: query
+      required: true
+      description: ID resource berupa bilangan bulat positif.
+      schema:
+        type: integer
+        minimum: 1
+  responses:
+    BadRequest:
+      description: Request tidak valid atau ID tidak valid.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ApiResponse'
+    Unauthorized:
+      description: Token tidak ditemukan, tidak valid, atau kedaluwarsa.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ApiResponse'
+    UnsupportedMediaType:
+      description: Content-Type harus application/json atau multipart/form-data.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ApiResponse'
+    InternalServerError:
+      description: Terjadi kesalahan saat memproses request.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ApiResponse'
+  schemas:
+    ApiResponse:
+      type: object
+      required:
+        - success
+        - message
+        - data
+        - errors
+        - timestamp
+      properties:
+        success:
+          type: boolean
+        message:
+          type: string
+        data:
+          description: Data hasil operasi berupa object atau array, null jika request gagal.
+          oneOf:
+            - type: object
+              nullable: true
+            - type: array
+              items: {}
+        errors:
+          description: Array kosong ketika tidak ada kesalahan; dapat berisi pesan kesalahan.
+          oneOf:
+            - type: array
+              items: {}
+            - type: object
+              additionalProperties:
+                type: array
+                items:
+                  type: string
+        timestamp:
+          type: string
+          format: date-time
+    LoginResponse:
+      allOf:
+        - $ref: '#/components/schemas/ApiResponse'
+        - type: object
+          properties:
+            data:
+              type: object
+              required:
+                - token
+                - role
+              properties:
+                token:
+                  type: string
+                  description: JWT yang berlaku selama lima menit.
+                role:
+                  type: string
+                  example: user
+    RegisterRequest:
+      type: object
+      required:
+        - username
+        - email
+        - password
+      properties:
+        username:
+          type: string
+        email:
+          type: string
+          format: email
+        password:
+          type: string
+          format: password
+    LoginRequest:
+      type: object
+      required:
+        - username
+        - password
+      properties:
+        username:
+          type: string
+        password:
+          type: string
+          format: password
+    MahasiswaRequest:
+      type: object
+      required:
+        - nim
+        - nama
+        - email
+        - prodi_id
+        - angkatan
+      properties:
+        nim:
+          type: string
+          pattern: '^[0-9]{9}$'
+          description: NIM harus terdiri dari tepat sembilan digit.
+        nama:
+          type: string
+          minLength: 1
+          maxLength: 100
+        email:
+          type: string
+          format: email
+          maxLength: 100
+        prodi_id:
+          type: integer
+          minimum: 1
+          description: Harus mengacu pada program studi yang tersedia.
+        angkatan:
+          type: integer
+          minimum: 2000
+          maximum: 2155
+        status:
+          type: string
+          enum:
+            - aktif
+            - cuti
+            - lulus
+          default: aktif
+    MahasiswaMultipartRequest:
+      type: object
+      required:
+        - nim
+        - nama
+        - email
+        - prodi_id
+        - angkatan
+      properties:
+        nim:
+          type: string
+          pattern: '^[0-9]{9}$'
+        nama:
+          type: string
+          maxLength: 100
+        email:
+          type: string
+          format: email
+          maxLength: 100
+        prodi_id:
+          type: integer
+          minimum: 1
+        angkatan:
+          type: integer
+          minimum: 2000
+          maximum: 2155
+        status:
+          type: string
+          enum: [aktif, cuti, lulus]
+        foto:
+          type: string
+          format: binary
+          description: Opsional; JPG/JPEG/PNG valid, maksimal 2 MB.
+    BukuRequest:
+      type: object
+      required:
+        - judul
+        - penulis
+        - penerbit
+        - tahun_terbit
+        - stok
+      properties:
+        judul:
+          type: string
+          maxLength: 150
+        penulis:
+          type: string
+          maxLength: 100
+        penerbit:
+          type: string
+          maxLength: 100
+        tahun_terbit:
+          type: integer
+          minimum: 1900
+          maximum: 2155
+        stok:
+          type: integer
+          minimum: 0
+    Mahasiswa:
+      allOf:
+        - $ref: '#/components/schemas/MahasiswaRequest'
+        - type: object
+          properties:
+            id:
+              type: integer
+              minimum: 1
+    Buku:
+      allOf:
+        - $ref: '#/components/schemas/BukuRequest'
+        - type: object
+          properties:
+            id:
+              type: integer
+              minimum: 1

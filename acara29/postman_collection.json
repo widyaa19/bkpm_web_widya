@@ -1,0 +1,1259 @@
+{
+    "info":  {
+                 "_postman_id":  "0c1ed516-6ecf-4d70-9788-593ad7b89cc0",
+                 "name":  "API Sistem Informasi Akademik (MVC)",
+                 "description":  "Suite endpoint umum versi lama. Untuk pengujian login dan RBAC pada API mahasiswa, gunakan postman_collection_rbac.json. Beberapa contoh operasi tulis di suite ini mendahului pembatasan role admin.",
+                 "schema":  "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+             },
+    "variable":  [
+                     {
+                         "key":  "base_url",
+                         "value":  "http://localhost/bkpm_web/acara28/public"
+                     },
+                     {
+                         "key":  "mahasiswaId",
+                         "value":  "1"
+                     },
+                     {
+                         "key":  "testNim",
+                         "value":  "23016001"
+                     },
+                     {
+                         "key":  "jwt",
+                         "value":  ""
+                     },
+                     {
+                         "key":  "registerUsername",
+                         "value":  ""
+                     },
+                     {
+                         "key":  "registerEmail",
+                         "value":  ""
+                     }
+                 ],
+    "item":  [
+                 {
+                     "name":  "POST - Registrasi user berhasil",
+                     "event":  [
+                                   {
+                                       "listen":  "prerequest",
+                                       "script":  {
+                                                      "type":  "text/javascript",
+                                                      "exec":  [
+                                                                   "const unique = Date.now().toString();",
+                                                                   "pm.collectionVariables.set(\u0027registerUsername\u0027, \u0027user_\u0027 + unique);",
+                                                                   "pm.collectionVariables.set(\u0027registerEmail\u0027, \u0027user_\u0027 + unique + \u0027@example.com\u0027);"
+                                                               ]
+                                                  }
+                                   },
+                                   {
+                                       "listen":  "test",
+                                       "script":  {
+                                                      "type":  "text/javascript",
+                                                      "exec":  [
+                                                                   "pm.test(\u0027Status 201 Created\u0027, function () { pm.response.to.have.status(201); });",
+                                                                   "pm.test(\u0027Registrasi berhasil\u0027, function () { pm.expect(pm.response.json().success).to.eql(true); });"
+                                                               ]
+                                                  }
+                                   }
+                               ],
+                     "request":  {
+                                     "method":  "POST",
+                                     "header":  [
+                                                    {
+                                                        "key":  "Content-Type",
+                                                        "value":  "application/json"
+                                                    }
+                                                ],
+                                     "body":  {
+                                                  "mode":  "raw",
+                                                  "raw":  "{\n  \"username\": \"{{registerUsername}}\",\n  \"email\": \"{{registerEmail}}\",\n  \"password\": \"password123\"\n}",
+                                                  "options":  {
+                                                                  "raw":  {
+                                                                              "language":  "json"
+                                                                          }
+                                                              }
+                                              },
+                                     "url":  "{{base_url}}/register",
+                                     "description":  "Controller: AuthController::register() — membuat akun user baru melalui JSON. Username dan email request dibuat unik otomatis untuk pengujian."
+                                 },
+                     "response":  [
+                                      {
+                                          "name":  "201 Created - Registrasi berhasil",
+                                          "originalRequest":  {
+                                                                  "method":  "POST",
+                                                                  "header":  [
+                                                                                 {
+                                                                                     "key":  "Content-Type",
+                                                                                     "value":  "application/json"
+                                                                                 }
+                                                                             ],
+                                                                  "url":  "{{base_url}}/register",
+                                                                  "body":  {
+                                                                               "mode":  "raw",
+                                                                               "raw":  "{\n  \"username\": \"{{registerUsername}}\",\n  \"email\": \"{{registerEmail}}\",\n  \"password\": \"password123\"\n}",
+                                                                               "options":  {
+                                                                                               "raw":  {
+                                                                                                           "language":  "json"
+                                                                                                       }
+                                                                                           }
+                                                                           }
+                                                              },
+                                          "status":  "Created",
+                                          "code":  201,
+                                          "_postman_previewlanguage":  "json",
+                                          "header":  [
+                                                         {
+                                                             "key":  "Content-Type",
+                                                             "value":  "application/json; charset=utf-8"
+                                                         }
+                                                     ],
+                                          "body":  "{\r\n    \"success\":  true,\r\n    \"message\":  \"Registrasi berhasil.\",\r\n    \"data\":  {\r\n                 \"id\":  \"1\"\r\n             },\r\n    \"errors\":  [\r\n\r\n               ],\r\n    \"timestamp\":  \"2026-10-27T11:00:00+00:00\"\r\n}"
+                                      },
+                                      {
+                                          "name":  "409 Conflict - Username atau email sudah terdaftar",
+                                          "originalRequest":  {
+                                                                  "method":  "POST",
+                                                                  "header":  [
+                                                                                 {
+                                                                                     "key":  "Content-Type",
+                                                                                     "value":  "application/json"
+                                                                                 }
+                                                                             ],
+                                                                  "url":  "{{base_url}}/register",
+                                                                  "body":  {
+                                                                               "mode":  "raw",
+                                                                               "raw":  "{\n  \"username\": \"{{registerUsername}}\",\n  \"email\": \"{{registerEmail}}\",\n  \"password\": \"password123\"\n}",
+                                                                               "options":  {
+                                                                                               "raw":  {
+                                                                                                           "language":  "json"
+                                                                                                       }
+                                                                                           }
+                                                                           }
+                                                              },
+                                          "status":  "Conflict",
+                                          "code":  409,
+                                          "_postman_previewlanguage":  "json",
+                                          "header":  [
+                                                         {
+                                                             "key":  "Content-Type",
+                                                             "value":  "application/json; charset=utf-8"
+                                                         }
+                                                     ],
+                                          "body":  "{\r\n    \"success\":  false,\r\n    \"message\":  \"Username atau email sudah terdaftar.\",\r\n    \"data\":  null,\r\n    \"errors\":  [\r\n\r\n               ],\r\n    \"timestamp\":  \"2026-10-27T11:00:00+00:00\"\r\n}"
+                                      }
+                                  ]
+                 },
+                 {
+                     "name":  "POST - Login user dan memperoleh JWT",
+                     "request":  {
+                                     "method":  "POST",
+                                     "header":  [
+                                                    {
+                                                        "key":  "Content-Type",
+                                                        "value":  "application/json"
+                                                    }
+                                                ],
+                                     "body":  {
+                                                  "mode":  "raw",
+                                                  "raw":  "{\n  \"username\": \"{{registerUsername}}\",\n  \"password\": \"password123\"\n}",
+                                                  "options":  {
+                                                                  "raw":  {
+                                                                              "language":  "json"
+                                                                          }
+                                                              }
+                                              },
+                                     "url":  "{{base_url}}/login",
+                                     "description":  "Controller: AuthController::login() — autentikasi pengguna melalui JSON dan menghasilkan JWT. Jalankan setelah registrasi. Token disimpan pada collection variable jwt untuk request mahasiswa yang memerlukan autentikasi."
+                                 },
+                     "event":  [
+                                   {
+                                       "listen":  "test",
+                                       "script":  {
+                                                      "type":  "text/javascript",
+                                                      "exec":  [
+                                                                   "pm.test(\u0027Status 200 OK\u0027, function () { pm.response.to.have.status(200); });",
+                                                                   "pm.test(\u0027Login berhasil dan token tersedia\u0027, function () { const body = pm.response.json(); pm.expect(body.success).to.eql(true); pm.expect(body.data.token).to.be.a(\u0027string\u0027); pm.collectionVariables.set(\u0027jwt\u0027, body.data.token); });"
+                                                               ]
+                                                  }
+                                   }
+                               ],
+                     "response":  [
+                                      {
+                                          "name":  "200 OK - Login berhasil",
+                                          "originalRequest":  {
+                                                                  "method":  "POST",
+                                                                  "header":  [
+                                                                                 {
+                                                                                     "key":  "Content-Type",
+                                                                                     "value":  "application/json"
+                                                                                 }
+                                                                             ],
+                                                                  "url":  "{{base_url}}/login",
+                                                                  "body":  {
+                                                                               "mode":  "raw",
+                                                                               "raw":  "{\n  \"username\": \"{{registerUsername}}\",\n  \"password\": \"password123\"\n}",
+                                                                               "options":  {
+                                                                                               "raw":  {
+                                                                                                           "language":  "json"
+                                                                                                       }
+                                                                                           }
+                                                                           }
+                                                              },
+                                          "status":  "OK",
+                                          "code":  200,
+                                          "_postman_previewlanguage":  "json",
+                                          "header":  [
+                                                         {
+                                                             "key":  "Content-Type",
+                                                             "value":  "application/json; charset=utf-8"
+                                                         }
+                                                     ],
+                                          "body":  "{\r\n    \"success\":  true,\r\n    \"message\":  \"Login berhasil.\",\r\n    \"data\":  {\r\n                 \"token\":  \"\\u003cjwt\\u003e\",\r\n                 \"role\":  \"user\"\r\n             },\r\n    \"errors\":  [\r\n\r\n               ],\r\n    \"timestamp\":  \"2026-10-27T11:00:00+00:00\"\r\n}"
+                                      },
+                                      {
+                                          "name":  "401 Unauthorized - Kredensial salah",
+                                          "originalRequest":  {
+                                                                  "method":  "POST",
+                                                                  "header":  [
+                                                                                 {
+                                                                                     "key":  "Content-Type",
+                                                                                     "value":  "application/json"
+                                                                                 }
+                                                                             ],
+                                                                  "url":  "{{base_url}}/login",
+                                                                  "body":  {
+                                                                               "mode":  "raw",
+                                                                               "raw":  "{\n  \"username\": \"{{registerUsername}}\",\n  \"password\": \"password123\"\n}",
+                                                                               "options":  {
+                                                                                               "raw":  {
+                                                                                                           "language":  "json"
+                                                                                                       }
+                                                                                           }
+                                                                           }
+                                                              },
+                                          "status":  "Unauthorized",
+                                          "code":  401,
+                                          "_postman_previewlanguage":  "json",
+                                          "header":  [
+                                                         {
+                                                             "key":  "Content-Type",
+                                                             "value":  "application/json; charset=utf-8"
+                                                         }
+                                                     ],
+                                          "body":  "{\r\n    \"success\":  false,\r\n    \"message\":  \"Username atau password salah.\",\r\n    \"data\":  null,\r\n    \"errors\":  [\r\n\r\n               ],\r\n    \"timestamp\":  \"2026-10-27T11:00:00+00:00\"\r\n}"
+                                      }
+                                  ]
+                 },
+                 {
+                     "name":  "GET - Semua mahasiswa",
+                     "request":  {
+                                     "method":  "GET",
+                                     "header":  [
+
+                                                ],
+                                     "url":  "{{base_url}}/api/mahasiswa",
+                                     "description":  "Controller: ApiMahasiswaController::index() — mengambil seluruh data mahasiswa. Endpoint publik."
+                                 },
+                     "response":  [
+                                      {
+                                          "name":  "200 OK - Daftar mahasiswa",
+                                          "originalRequest":  {
+                                                                  "method":  "GET",
+                                                                  "header":  [
+
+                                                                             ],
+                                                                  "url":  "{{base_url}}/api/mahasiswa"
+                                                              },
+                                          "status":  "OK",
+                                          "code":  200,
+                                          "_postman_previewlanguage":  "json",
+                                          "header":  [
+                                                         {
+                                                             "key":  "Content-Type",
+                                                             "value":  "application/json; charset=utf-8"
+                                                         }
+                                                     ],
+                                          "body":  "{\r\n    \"success\":  true,\r\n    \"message\":  \"Data berhasil diambil.\",\r\n    \"data\":  [\r\n                 {\r\n                     \"id\":  1,\r\n                     \"nim\":  \"230160001\",\r\n                     \"nama\":  \"Dewi\",\r\n                     \"email\":  \"dewi@example.com\",\r\n                     \"prodi_id\":  1,\r\n                     \"angkatan\":  2023,\r\n                     \"status\":  \"aktif\"\r\n                 }\r\n             ],\r\n    \"errors\":  [\r\n\r\n               ],\r\n    \"timestamp\":  \"2026-10-27T11:00:00+00:00\"\r\n}"
+                                      },
+                                      {
+                                          "name":  "500 Internal Server Error - Gagal mengambil data",
+                                          "originalRequest":  {
+                                                                  "method":  "GET",
+                                                                  "header":  [
+
+                                                                             ],
+                                                                  "url":  "{{base_url}}/api/mahasiswa"
+                                                              },
+                                          "status":  "Internal Server Error",
+                                          "code":  500,
+                                          "_postman_previewlanguage":  "json",
+                                          "header":  [
+                                                         {
+                                                             "key":  "Content-Type",
+                                                             "value":  "application/json; charset=utf-8"
+                                                         }
+                                                     ],
+                                          "body":  "{\r\n    \"success\":  false,\r\n    \"message\":  \"Data mahasiswa gagal diambil.\",\r\n    \"data\":  null,\r\n    \"errors\":  [\r\n\r\n               ],\r\n    \"timestamp\":  \"2026-10-27T11:00:00+00:00\"\r\n}"
+                                      }
+                                  ]
+                 },
+                 {
+                     "name":  "GET - Mahasiswa berdasarkan ID",
+                     "request":  {
+                                     "method":  "GET",
+                                     "header":  [
+
+                                                ],
+                                     "url":  "{{base_url}}/api/mahasiswa?id={{mahasiswaId}}",
+                                     "description":  "Controller: ApiMahasiswaController::index() — mengambil satu mahasiswa dari query parameter id. Endpoint publik."
+                                 },
+                     "response":  [
+                                      {
+                                          "name":  "200 OK - Mahasiswa ditemukan",
+                                          "originalRequest":  {
+                                                                  "method":  "GET",
+                                                                  "header":  [
+
+                                                                             ],
+                                                                  "url":  "{{base_url}}/api/mahasiswa?id={{mahasiswaId}}"
+                                                              },
+                                          "status":  "OK",
+                                          "code":  200,
+                                          "_postman_previewlanguage":  "json",
+                                          "header":  [
+                                                         {
+                                                             "key":  "Content-Type",
+                                                             "value":  "application/json; charset=utf-8"
+                                                         }
+                                                     ],
+                                          "body":  "{\r\n    \"success\":  true,\r\n    \"message\":  \"Data berhasil diambil.\",\r\n    \"data\":  {\r\n                 \"id\":  1,\r\n                 \"nim\":  \"230160001\",\r\n                 \"nama\":  \"Dewi\",\r\n                 \"email\":  \"dewi@example.com\",\r\n                 \"prodi_id\":  1,\r\n                 \"angkatan\":  2023,\r\n                 \"status\":  \"aktif\"\r\n             },\r\n    \"errors\":  [\r\n\r\n               ],\r\n    \"timestamp\":  \"2026-10-27T11:00:00+00:00\"\r\n}"
+                                      },
+                                      {
+                                          "name":  "404 Not Found - Mahasiswa tidak ditemukan",
+                                          "originalRequest":  {
+                                                                  "method":  "GET",
+                                                                  "header":  [
+
+                                                                             ],
+                                                                  "url":  "{{base_url}}/api/mahasiswa?id={{mahasiswaId}}"
+                                                              },
+                                          "status":  "Not Found",
+                                          "code":  404,
+                                          "_postman_previewlanguage":  "json",
+                                          "header":  [
+                                                         {
+                                                             "key":  "Content-Type",
+                                                             "value":  "application/json; charset=utf-8"
+                                                         }
+                                                     ],
+                                          "body":  "{\r\n    \"success\":  false,\r\n    \"message\":  \"Data mahasiswa tidak ditemukan.\",\r\n    \"data\":  null,\r\n    \"errors\":  [\r\n\r\n               ],\r\n    \"timestamp\":  \"2026-10-27T11:00:00+00:00\"\r\n}"
+                                      }
+                                  ]
+                 },
+                 {
+                     "name":  "POST - Tambah mahasiswa",
+                     "event":  [
+                                   {
+                                       "listen":  "prerequest",
+                                       "script":  {
+                                                      "type":  "text/javascript",
+                                                      "exec":  [
+                                                                   "pm.collectionVariables.set(\u0027testNim\u0027, String(Date.now()).slice(-9));"
+                                                               ]
+                                                  }
+                                   },
+                                   {
+                                       "listen":  "test",
+                                       "script":  {
+                                                      "type":  "text/javascript",
+                                                      "exec":  [
+                                                                   "pm.test(\u0027Status 201 Created\u0027, function () { pm.response.to.have.status(201); });",
+                                                                   "if (pm.response.code === 201) {",
+                                                                   "    const body = pm.response.json();",
+                                                                   "    pm.collectionVariables.set(\u0027mahasiswaId\u0027, body.data.id);",
+                                                                   "}"
+                                                               ]
+                                                  }
+                                   }
+                               ],
+                     "request":  {
+                                     "method":  "POST",
+                                     "header":  [
+                                                    {
+                                                        "key":  "Content-Type",
+                                                        "value":  "application/json"
+                                                    }
+                                                ],
+                                     "body":  {
+                                                  "mode":  "raw",
+                                                  "raw":  "{\n  \"nim\": \"{{testNim}}\",\n  \"nama\": \"Dewi\",\n  \"email\": \"dewi@example.com\",\n  \"prodi_id\": 1,\n  \"angkatan\": 2023,\n  \"status\": \"aktif\"\n}",
+                                                  "options":  {
+                                                                  "raw":  {
+                                                                              "language":  "json"
+                                                                          }
+                                                              }
+                                              },
+                                     "url":  "{{base_url}}/api/mahasiswa",
+                                     "description":  "Controller: ApiMahasiswaController::store() — menambahkan mahasiswa. Memerlukan Content-Type application/json dan Bearer JWT dari request login.",
+                                     "auth":  {
+                                                  "type":  "bearer",
+                                                  "bearer":  [
+                                                                 {
+                                                                     "key":  "token",
+                                                                     "value":  "{{jwt}}",
+                                                                     "type":  "string"
+                                                                 }
+                                                             ]
+                                              }
+                                 },
+                     "response":  [
+                                      {
+                                          "name":  "201 Created - Mahasiswa ditambahkan",
+                                          "originalRequest":  {
+                                                                  "method":  "POST",
+                                                                  "header":  [
+                                                                                 {
+                                                                                     "key":  "Content-Type",
+                                                                                     "value":  "application/json"
+                                                                                 }
+                                                                             ],
+                                                                  "url":  "{{base_url}}/api/mahasiswa",
+                                                                  "body":  {
+                                                                               "mode":  "raw",
+                                                                               "raw":  "{\n  \"nim\": \"{{testNim}}\",\n  \"nama\": \"Dewi\",\n  \"email\": \"dewi@example.com\",\n  \"prodi_id\": 1,\n  \"angkatan\": 2023,\n  \"status\": \"aktif\"\n}",
+                                                                               "options":  {
+                                                                                               "raw":  {
+                                                                                                           "language":  "json"
+                                                                                                       }
+                                                                                           }
+                                                                           },
+                                                                  "auth":  {
+                                                                               "type":  "bearer",
+                                                                               "bearer":  [
+                                                                                              {
+                                                                                                  "key":  "token",
+                                                                                                  "value":  "{{jwt}}",
+                                                                                                  "type":  "string"
+                                                                                              }
+                                                                                          ]
+                                                                           }
+                                                              },
+                                          "status":  "Created",
+                                          "code":  201,
+                                          "_postman_previewlanguage":  "json",
+                                          "header":  [
+                                                         {
+                                                             "key":  "Content-Type",
+                                                             "value":  "application/json; charset=utf-8"
+                                                         }
+                                                     ],
+                                          "body":  "{\r\n    \"success\":  true,\r\n    \"message\":  \"Data mahasiswa berhasil ditambahkan.\",\r\n    \"data\":  {\r\n                 \"id\":  1,\r\n                 \"nim\":  \"230160001\",\r\n                 \"nama\":  \"Dewi\",\r\n                 \"email\":  \"dewi@example.com\",\r\n                 \"prodi_id\":  1,\r\n                 \"angkatan\":  2023,\r\n                 \"status\":  \"aktif\"\r\n             },\r\n    \"errors\":  [\r\n\r\n               ],\r\n    \"timestamp\":  \"2026-10-27T11:00:00+00:00\"\r\n}"
+                                      },
+                                      {
+                                          "name":  "422 Unprocessable Entity - Validasi gagal",
+                                          "originalRequest":  {
+                                                                  "method":  "POST",
+                                                                  "header":  [
+                                                                                 {
+                                                                                     "key":  "Content-Type",
+                                                                                     "value":  "application/json"
+                                                                                 }
+                                                                             ],
+                                                                  "url":  "{{base_url}}/api/mahasiswa",
+                                                                  "body":  {
+                                                                               "mode":  "raw",
+                                                                               "raw":  "{\n  \"nim\": \"{{testNim}}\",\n  \"nama\": \"Dewi\",\n  \"email\": \"dewi@example.com\",\n  \"prodi_id\": 1,\n  \"angkatan\": 2023,\n  \"status\": \"aktif\"\n}",
+                                                                               "options":  {
+                                                                                               "raw":  {
+                                                                                                           "language":  "json"
+                                                                                                       }
+                                                                                           }
+                                                                           },
+                                                                  "auth":  {
+                                                                               "type":  "bearer",
+                                                                               "bearer":  [
+                                                                                              {
+                                                                                                  "key":  "token",
+                                                                                                  "value":  "{{jwt}}",
+                                                                                                  "type":  "string"
+                                                                                              }
+                                                                                          ]
+                                                                           }
+                                                              },
+                                          "status":  "Unprocessable Entity",
+                                          "code":  422,
+                                          "_postman_previewlanguage":  "json",
+                                          "header":  [
+                                                         {
+                                                             "key":  "Content-Type",
+                                                             "value":  "application/json; charset=utf-8"
+                                                         }
+                                                     ],
+                                          "body":  "{\r\n    \"success\":  false,\r\n    \"message\":  \"Data mahasiswa tidak valid.\",\r\n    \"data\":  null,\r\n    \"errors\":  {\r\n                   \"email\":  [\r\n                                 \"Email wajib berupa alamat email yang valid (maksimal 100 karakter).\"\r\n                             ]\r\n               },\r\n    \"timestamp\":  \"2026-10-27T11:00:00+00:00\"\r\n}"
+                                      }
+                                  ]
+                 },
+                 {
+                     "name":  "PUT - Ubah mahasiswa",
+                     "request":  {
+                                     "method":  "PUT",
+                                     "header":  [
+                                                    {
+                                                        "key":  "Content-Type",
+                                                        "value":  "application/json"
+                                                    }
+                                                ],
+                                     "body":  {
+                                                  "mode":  "raw",
+                                                  "raw":  "{\n  \"nim\": \"{{testNim}}\",\n  \"nama\": \"Dewi Santoso\",\n  \"email\": \"dewi.santoso@example.com\",\n  \"prodi_id\": 1,\n  \"angkatan\": 2023,\n  \"status\": \"aktif\"\n}",
+                                                  "options":  {
+                                                                  "raw":  {
+                                                                              "language":  "json"
+                                                                          }
+                                                              }
+                                              },
+                                     "url":  "{{base_url}}/api/mahasiswa?id={{mahasiswaId}}",
+                                     "description":  "Controller: ApiMahasiswaController::update() — memperbarui seluruh field mahasiswa menggunakan query parameter id. Memerlukan Content-Type application/json dan Bearer JWT.",
+                                     "auth":  {
+                                                  "type":  "bearer",
+                                                  "bearer":  [
+                                                                 {
+                                                                     "key":  "token",
+                                                                     "value":  "{{jwt}}",
+                                                                     "type":  "string"
+                                                                 }
+                                                             ]
+                                              }
+                                 },
+                     "response":  [
+                                      {
+                                          "name":  "200 OK - Mahasiswa diperbarui",
+                                          "originalRequest":  {
+                                                                  "method":  "PUT",
+                                                                  "header":  [
+                                                                                 {
+                                                                                     "key":  "Content-Type",
+                                                                                     "value":  "application/json"
+                                                                                 }
+                                                                             ],
+                                                                  "url":  "{{base_url}}/api/mahasiswa?id={{mahasiswaId}}",
+                                                                  "body":  {
+                                                                               "mode":  "raw",
+                                                                               "raw":  "{\n  \"nim\": \"{{testNim}}\",\n  \"nama\": \"Dewi Santoso\",\n  \"email\": \"dewi.santoso@example.com\",\n  \"prodi_id\": 1,\n  \"angkatan\": 2023,\n  \"status\": \"aktif\"\n}",
+                                                                               "options":  {
+                                                                                               "raw":  {
+                                                                                                           "language":  "json"
+                                                                                                       }
+                                                                                           }
+                                                                           },
+                                                                  "auth":  {
+                                                                               "type":  "bearer",
+                                                                               "bearer":  [
+                                                                                              {
+                                                                                                  "key":  "token",
+                                                                                                  "value":  "{{jwt}}",
+                                                                                                  "type":  "string"
+                                                                                              }
+                                                                                          ]
+                                                                           }
+                                                              },
+                                          "status":  "OK",
+                                          "code":  200,
+                                          "_postman_previewlanguage":  "json",
+                                          "header":  [
+                                                         {
+                                                             "key":  "Content-Type",
+                                                             "value":  "application/json; charset=utf-8"
+                                                         }
+                                                     ],
+                                          "body":  "{\r\n    \"success\":  true,\r\n    \"message\":  \"Data mahasiswa berhasil diperbarui.\",\r\n    \"data\":  {\r\n                 \"id\":  1,\r\n                 \"nim\":  \"230160001\",\r\n                 \"nama\":  \"Dewi Santoso\",\r\n                 \"email\":  \"dewi.santoso@example.com\",\r\n                 \"prodi_id\":  1,\r\n                 \"angkatan\":  2023,\r\n                 \"status\":  \"aktif\"\r\n             },\r\n    \"errors\":  [\r\n\r\n               ],\r\n    \"timestamp\":  \"2026-10-27T11:00:00+00:00\"\r\n}"
+                                      },
+                                      {
+                                          "name":  "422 Unprocessable Entity - Validasi gagal",
+                                          "originalRequest":  {
+                                                                  "method":  "PUT",
+                                                                  "header":  [
+                                                                                 {
+                                                                                     "key":  "Content-Type",
+                                                                                     "value":  "application/json"
+                                                                                 }
+                                                                             ],
+                                                                  "url":  "{{base_url}}/api/mahasiswa?id={{mahasiswaId}}",
+                                                                  "body":  {
+                                                                               "mode":  "raw",
+                                                                               "raw":  "{\n  \"nim\": \"{{testNim}}\",\n  \"nama\": \"Dewi Santoso\",\n  \"email\": \"dewi.santoso@example.com\",\n  \"prodi_id\": 1,\n  \"angkatan\": 2023,\n  \"status\": \"aktif\"\n}",
+                                                                               "options":  {
+                                                                                               "raw":  {
+                                                                                                           "language":  "json"
+                                                                                                       }
+                                                                                           }
+                                                                           },
+                                                                  "auth":  {
+                                                                               "type":  "bearer",
+                                                                               "bearer":  [
+                                                                                              {
+                                                                                                  "key":  "token",
+                                                                                                  "value":  "{{jwt}}",
+                                                                                                  "type":  "string"
+                                                                                              }
+                                                                                          ]
+                                                                           }
+                                                              },
+                                          "status":  "Unprocessable Entity",
+                                          "code":  422,
+                                          "_postman_previewlanguage":  "json",
+                                          "header":  [
+                                                         {
+                                                             "key":  "Content-Type",
+                                                             "value":  "application/json; charset=utf-8"
+                                                         }
+                                                     ],
+                                          "body":  "{\r\n    \"success\":  false,\r\n    \"message\":  \"Data mahasiswa tidak valid.\",\r\n    \"data\":  null,\r\n    \"errors\":  {\r\n                   \"email\":  [\r\n                                 \"Email wajib berupa alamat email yang valid (maksimal 100 karakter).\"\r\n                             ]\r\n               },\r\n    \"timestamp\":  \"2026-10-27T11:00:00+00:00\"\r\n}"
+                                      }
+                                  ]
+                 },
+                 {
+                     "name":  "DELETE - Hapus mahasiswa",
+                     "request":  {
+                                     "method":  "DELETE",
+                                     "header":  [
+
+                                                ],
+                                     "url":  "{{base_url}}/api/mahasiswa?id={{mahasiswaId}}",
+                                     "description":  "Controller: ApiMahasiswaController::destroy() — menghapus mahasiswa menggunakan query parameter id. Memerlukan Bearer JWT.",
+                                     "auth":  {
+                                                  "type":  "bearer",
+                                                  "bearer":  [
+                                                                 {
+                                                                     "key":  "token",
+                                                                     "value":  "{{jwt}}",
+                                                                     "type":  "string"
+                                                                 }
+                                                             ]
+                                              }
+                                 },
+                     "response":  [
+                                      {
+                                          "name":  "200 OK - Mahasiswa dihapus",
+                                          "originalRequest":  {
+                                                                  "method":  "DELETE",
+                                                                  "header":  [
+
+                                                                             ],
+                                                                  "url":  "{{base_url}}/api/mahasiswa?id={{mahasiswaId}}",
+                                                                  "auth":  {
+                                                                               "type":  "bearer",
+                                                                               "bearer":  [
+                                                                                              {
+                                                                                                  "key":  "token",
+                                                                                                  "value":  "{{jwt}}",
+                                                                                                  "type":  "string"
+                                                                                              }
+                                                                                          ]
+                                                                           }
+                                                              },
+                                          "status":  "OK",
+                                          "code":  200,
+                                          "_postman_previewlanguage":  "json",
+                                          "header":  [
+                                                         {
+                                                             "key":  "Content-Type",
+                                                             "value":  "application/json; charset=utf-8"
+                                                         }
+                                                     ],
+                                          "body":  "{\r\n    \"success\":  true,\r\n    \"message\":  \"Data mahasiswa berhasil dihapus.\",\r\n    \"data\":  {\r\n                 \"id\":  1,\r\n                 \"nim\":  \"230160001\",\r\n                 \"nama\":  \"Dewi\",\r\n                 \"email\":  \"dewi@example.com\",\r\n                 \"prodi_id\":  1,\r\n                 \"angkatan\":  2023,\r\n                 \"status\":  \"aktif\"\r\n             },\r\n    \"errors\":  [\r\n\r\n               ],\r\n    \"timestamp\":  \"2026-10-27T11:00:00+00:00\"\r\n}"
+                                      },
+                                      {
+                                          "name":  "404 Not Found - Mahasiswa tidak ditemukan",
+                                          "originalRequest":  {
+                                                                  "method":  "DELETE",
+                                                                  "header":  [
+
+                                                                             ],
+                                                                  "url":  "{{base_url}}/api/mahasiswa?id={{mahasiswaId}}",
+                                                                  "auth":  {
+                                                                               "type":  "bearer",
+                                                                               "bearer":  [
+                                                                                              {
+                                                                                                  "key":  "token",
+                                                                                                  "value":  "{{jwt}}",
+                                                                                                  "type":  "string"
+                                                                                              }
+                                                                                          ]
+                                                                           }
+                                                              },
+                                          "status":  "Not Found",
+                                          "code":  404,
+                                          "_postman_previewlanguage":  "json",
+                                          "header":  [
+                                                         {
+                                                             "key":  "Content-Type",
+                                                             "value":  "application/json; charset=utf-8"
+                                                         }
+                                                     ],
+                                          "body":  "{\r\n    \"success\":  false,\r\n    \"message\":  \"Data mahasiswa tidak ditemukan.\",\r\n    \"data\":  null,\r\n    \"errors\":  [\r\n\r\n               ],\r\n    \"timestamp\":  \"2026-10-27T11:00:00+00:00\"\r\n}"
+                                      }
+                                  ]
+                 },
+                 {
+                     "name":  "GET - ID tidak ditemukan (404)",
+                     "event":  [
+                                   {
+                                       "listen":  "test",
+                                       "script":  {
+                                                      "type":  "text/javascript",
+                                                      "exec":  [
+                                                                   "pm.test(\u0027Status 404 Not Found\u0027, function () { pm.response.to.have.status(404); });",
+                                                                   "pm.test(\u0027Response menyatakan gagal\u0027, function () { pm.expect(pm.response.json().success).to.eql(false); });"
+                                                               ]
+                                                  }
+                                   }
+                               ],
+                     "request":  {
+                                     "method":  "GET",
+                                     "header":  [
+
+                                                ],
+                                     "url":  "{{base_url}}/api/mahasiswa/999999",
+                                     "description":  "Controller: ApiMahasiswaController::show() — contoh respons gagal ketika ID mahasiswa tidak ditemukan. Endpoint publik."
+                                 },
+                     "response":  [
+                                      {
+                                          "name":  "404 Not Found - ID tidak ditemukan",
+                                          "originalRequest":  {
+                                                                  "method":  "GET",
+                                                                  "header":  [
+
+                                                                             ],
+                                                                  "url":  "{{base_url}}/api/mahasiswa/999999"
+                                                              },
+                                          "status":  "Not Found",
+                                          "code":  404,
+                                          "_postman_previewlanguage":  "json",
+                                          "header":  [
+                                                         {
+                                                             "key":  "Content-Type",
+                                                             "value":  "application/json; charset=utf-8"
+                                                         }
+                                                     ],
+                                          "body":  "{\r\n    \"success\":  false,\r\n    \"message\":  \"Data mahasiswa tidak ditemukan.\",\r\n    \"data\":  null,\r\n    \"errors\":  [\r\n\r\n               ],\r\n    \"timestamp\":  \"2026-10-27T11:00:00+00:00\"\r\n}"
+                                      },
+                                      {
+                                          "name":  "200 OK - Mahasiswa ditemukan",
+                                          "originalRequest":  {
+                                                                  "method":  "GET",
+                                                                  "header":  [
+
+                                                                             ],
+                                                                  "url":  "{{base_url}}/api/mahasiswa/999999"
+                                                              },
+                                          "status":  "OK",
+                                          "code":  200,
+                                          "_postman_previewlanguage":  "json",
+                                          "header":  [
+                                                         {
+                                                             "key":  "Content-Type",
+                                                             "value":  "application/json; charset=utf-8"
+                                                         }
+                                                     ],
+                                          "body":  "{\r\n    \"success\":  true,\r\n    \"message\":  \"Data berhasil diambil.\",\r\n    \"data\":  {\r\n                 \"id\":  1,\r\n                 \"nim\":  \"230160001\",\r\n                 \"nama\":  \"Dewi\",\r\n                 \"email\":  \"dewi@example.com\",\r\n                 \"prodi_id\":  1,\r\n                 \"angkatan\":  2023,\r\n                 \"status\":  \"aktif\"\r\n             },\r\n    \"errors\":  [\r\n\r\n               ],\r\n    \"timestamp\":  \"2026-10-27T11:00:00+00:00\"\r\n}"
+                                      }
+                                  ]
+                 },
+                 {
+                     "name":  "POST - NIM kosong (422)",
+                     "event":  [
+                                   {
+                                       "listen":  "test",
+                                       "script":  {
+                                                      "type":  "text/javascript",
+                                                      "exec":  [
+                                                                   "pm.test(\u0027Status 422 Unprocessable Entity\u0027, function () { pm.response.to.have.status(422); });",
+                                                                   "pm.test(\u0027Response berisi rincian validasi\u0027, function () { const errors = pm.response.json().errors; pm.expect(errors).to.be.an(\u0027object\u0027); pm.expect(Object.keys(errors).length).to.be.above(0); });"
+                                                               ]
+                                                  }
+                                   }
+                               ],
+                     "request":  {
+                                     "method":  "POST",
+                                     "header":  [
+                                                    {
+                                                        "key":  "Content-Type",
+                                                        "value":  "application/json"
+                                                    }
+                                                ],
+                                     "body":  {
+                                                  "mode":  "raw",
+                                                  "raw":  "{\n  \"nim\": \"\",\n  \"nama\": \"Dewi\",\n  \"email\": \"dewi@example.com\",\n  \"prodi_id\": 1,\n  \"angkatan\": 2023\n}",
+                                                  "options":  {
+                                                                  "raw":  {
+                                                                              "language":  "json"
+                                                                          }
+                                                              }
+                                              },
+                                     "url":  "{{base_url}}/api/mahasiswa",
+                                     "description":  "Controller: ApiMahasiswaController::store() — contoh validasi gagal karena NIM tidak memenuhi format tepat 9 digit. Implementasi mengembalikan 422 Unprocessable Entity. Memerlukan Bearer JWT.",
+                                     "auth":  {
+                                                  "type":  "bearer",
+                                                  "bearer":  [
+                                                                 {
+                                                                     "key":  "token",
+                                                                     "value":  "{{jwt}}",
+                                                                     "type":  "string"
+                                                                 }
+                                                             ]
+                                              }
+                                 },
+                     "response":  [
+                                      {
+                                          "name":  "422 Unprocessable Entity - Format NIM salah",
+                                          "originalRequest":  {
+                                                                  "method":  "POST",
+                                                                  "header":  [
+                                                                                 {
+                                                                                     "key":  "Content-Type",
+                                                                                     "value":  "application/json"
+                                                                                 }
+                                                                             ],
+                                                                  "url":  "{{base_url}}/api/mahasiswa",
+                                                                  "body":  {
+                                                                               "mode":  "raw",
+                                                                               "raw":  "{\n  \"nim\": \"\",\n  \"nama\": \"Dewi\",\n  \"email\": \"dewi@example.com\",\n  \"prodi_id\": 1,\n  \"angkatan\": 2023\n}",
+                                                                               "options":  {
+                                                                                               "raw":  {
+                                                                                                           "language":  "json"
+                                                                                                       }
+                                                                                           }
+                                                                           },
+                                                                  "auth":  {
+                                                                               "type":  "bearer",
+                                                                               "bearer":  [
+                                                                                              {
+                                                                                                  "key":  "token",
+                                                                                                  "value":  "{{jwt}}",
+                                                                                                  "type":  "string"
+                                                                                              }
+                                                                                          ]
+                                                                           }
+                                                              },
+                                          "status":  "Unprocessable Entity",
+                                          "code":  422,
+                                          "_postman_previewlanguage":  "json",
+                                          "header":  [
+                                                         {
+                                                             "key":  "Content-Type",
+                                                             "value":  "application/json; charset=utf-8"
+                                                         }
+                                                     ],
+                                          "body":  "{\r\n    \"success\":  false,\r\n    \"message\":  \"Format NIM tidak valid, harus 9 digit.\",\r\n    \"data\":  null,\r\n    \"errors\":  {\r\n                   \"nim\":  [\r\n                               \"Format NIM tidak valid, harus 9 digit.\"\r\n                           ]\r\n               },\r\n    \"timestamp\":  \"2026-10-27T11:00:00+00:00\"\r\n}"
+                                      },
+                                      {
+                                          "name":  "201 Created - Data valid",
+                                          "originalRequest":  {
+                                                                  "method":  "POST",
+                                                                  "header":  [
+                                                                                 {
+                                                                                     "key":  "Content-Type",
+                                                                                     "value":  "application/json"
+                                                                                 }
+                                                                             ],
+                                                                  "url":  "{{base_url}}/api/mahasiswa",
+                                                                  "body":  {
+                                                                               "mode":  "raw",
+                                                                               "raw":  "{\n  \"nim\": \"\",\n  \"nama\": \"Dewi\",\n  \"email\": \"dewi@example.com\",\n  \"prodi_id\": 1,\n  \"angkatan\": 2023\n}",
+                                                                               "options":  {
+                                                                                               "raw":  {
+                                                                                                           "language":  "json"
+                                                                                                       }
+                                                                                           }
+                                                                           },
+                                                                  "auth":  {
+                                                                               "type":  "bearer",
+                                                                               "bearer":  [
+                                                                                              {
+                                                                                                  "key":  "token",
+                                                                                                  "value":  "{{jwt}}",
+                                                                                                  "type":  "string"
+                                                                                              }
+                                                                                          ]
+                                                                           }
+                                                              },
+                                          "status":  "Created",
+                                          "code":  201,
+                                          "_postman_previewlanguage":  "json",
+                                          "header":  [
+                                                         {
+                                                             "key":  "Content-Type",
+                                                             "value":  "application/json; charset=utf-8"
+                                                         }
+                                                     ],
+                                          "body":  "{\r\n    \"success\":  true,\r\n    \"message\":  \"Data mahasiswa berhasil ditambahkan.\",\r\n    \"data\":  {\r\n                 \"id\":  1,\r\n                 \"nim\":  \"230160001\",\r\n                 \"nama\":  \"Dewi\",\r\n                 \"email\":  \"dewi@example.com\",\r\n                 \"prodi_id\":  1,\r\n                 \"angkatan\":  2023,\r\n                 \"status\":  \"aktif\"\r\n             },\r\n    \"errors\":  [\r\n\r\n               ],\r\n    \"timestamp\":  \"2026-10-27T11:00:00+00:00\"\r\n}"
+                                      }
+                                  ]
+                 },
+                 {
+                     "name":  "POST - Email tidak valid (422)",
+                     "event":  [
+                                   {
+                                       "listen":  "test",
+                                       "script":  {
+                                                      "type":  "text/javascript",
+                                                      "exec":  [
+                                                                   "pm.test(\u0027Status 422 Unprocessable Entity\u0027, function () { pm.response.to.have.status(422); });",
+                                                                   "pm.test(\u0027Response berisi rincian validasi\u0027, function () { const errors = pm.response.json().errors; pm.expect(errors).to.be.an(\u0027object\u0027); pm.expect(Object.keys(errors).length).to.be.above(0); });"
+                                                               ]
+                                                  }
+                                   }
+                               ],
+                     "request":  {
+                                     "method":  "POST",
+                                     "header":  [
+                                                    {
+                                                        "key":  "Content-Type",
+                                                        "value":  "application/json"
+                                                    }
+                                                ],
+                                     "body":  {
+                                                  "mode":  "raw",
+                                                  "raw":  "{\n  \"nim\": \"23016002\",\n  \"nama\": \"Dewi\",\n  \"email\": \"email-tidak-valid\",\n  \"prodi_id\": 1,\n  \"angkatan\": 2023\n}",
+                                                  "options":  {
+                                                                  "raw":  {
+                                                                              "language":  "json"
+                                                                          }
+                                                              }
+                                              },
+                                     "url":  "{{base_url}}/api/mahasiswa",
+                                     "description":  "Controller: ApiMahasiswaController::store() — contoh validasi gagal karena email tidak valid. Implementasi mengembalikan 422 Unprocessable Entity. Memerlukan Bearer JWT.",
+                                     "auth":  {
+                                                  "type":  "bearer",
+                                                  "bearer":  [
+                                                                 {
+                                                                     "key":  "token",
+                                                                     "value":  "{{jwt}}",
+                                                                     "type":  "string"
+                                                                 }
+                                                             ]
+                                              }
+                                 },
+                     "response":  [
+                                      {
+                                          "name":  "422 Unprocessable Entity - Email tidak valid",
+                                          "originalRequest":  {
+                                                                  "method":  "POST",
+                                                                  "header":  [
+                                                                                 {
+                                                                                     "key":  "Content-Type",
+                                                                                     "value":  "application/json"
+                                                                                 }
+                                                                             ],
+                                                                  "url":  "{{base_url}}/api/mahasiswa",
+                                                                  "body":  {
+                                                                               "mode":  "raw",
+                                                                               "raw":  "{\n  \"nim\": \"23016002\",\n  \"nama\": \"Dewi\",\n  \"email\": \"email-tidak-valid\",\n  \"prodi_id\": 1,\n  \"angkatan\": 2023\n}",
+                                                                               "options":  {
+                                                                                               "raw":  {
+                                                                                                           "language":  "json"
+                                                                                                       }
+                                                                                           }
+                                                                           },
+                                                                  "auth":  {
+                                                                               "type":  "bearer",
+                                                                               "bearer":  [
+                                                                                              {
+                                                                                                  "key":  "token",
+                                                                                                  "value":  "{{jwt}}",
+                                                                                                  "type":  "string"
+                                                                                              }
+                                                                                          ]
+                                                                           }
+                                                              },
+                                          "status":  "Unprocessable Entity",
+                                          "code":  422,
+                                          "_postman_previewlanguage":  "json",
+                                          "header":  [
+                                                         {
+                                                             "key":  "Content-Type",
+                                                             "value":  "application/json; charset=utf-8"
+                                                         }
+                                                     ],
+                                          "body":  "{\r\n    \"success\":  false,\r\n    \"message\":  \"Data mahasiswa tidak valid.\",\r\n    \"data\":  null,\r\n    \"errors\":  {\r\n                   \"email\":  [\r\n                                 \"Email wajib berupa alamat email yang valid (maksimal 100 karakter).\"\r\n                             ]\r\n               },\r\n    \"timestamp\":  \"2026-10-27T11:00:00+00:00\"\r\n}"
+                                      },
+                                      {
+                                          "name":  "201 Created - Data valid",
+                                          "originalRequest":  {
+                                                                  "method":  "POST",
+                                                                  "header":  [
+                                                                                 {
+                                                                                     "key":  "Content-Type",
+                                                                                     "value":  "application/json"
+                                                                                 }
+                                                                             ],
+                                                                  "url":  "{{base_url}}/api/mahasiswa",
+                                                                  "body":  {
+                                                                               "mode":  "raw",
+                                                                               "raw":  "{\n  \"nim\": \"23016002\",\n  \"nama\": \"Dewi\",\n  \"email\": \"email-tidak-valid\",\n  \"prodi_id\": 1,\n  \"angkatan\": 2023\n}",
+                                                                               "options":  {
+                                                                                               "raw":  {
+                                                                                                           "language":  "json"
+                                                                                                       }
+                                                                                           }
+                                                                           },
+                                                                  "auth":  {
+                                                                               "type":  "bearer",
+                                                                               "bearer":  [
+                                                                                              {
+                                                                                                  "key":  "token",
+                                                                                                  "value":  "{{jwt}}",
+                                                                                                  "type":  "string"
+                                                                                              }
+                                                                                          ]
+                                                                           }
+                                                              },
+                                          "status":  "Created",
+                                          "code":  201,
+                                          "_postman_previewlanguage":  "json",
+                                          "header":  [
+                                                         {
+                                                             "key":  "Content-Type",
+                                                             "value":  "application/json; charset=utf-8"
+                                                         }
+                                                     ],
+                                          "body":  "{\r\n    \"success\":  true,\r\n    \"message\":  \"Data mahasiswa berhasil ditambahkan.\",\r\n    \"data\":  {\r\n                 \"id\":  1,\r\n                 \"nim\":  \"230160001\",\r\n                 \"nama\":  \"Dewi\",\r\n                 \"email\":  \"dewi@example.com\",\r\n                 \"prodi_id\":  1,\r\n                 \"angkatan\":  2023,\r\n                 \"status\":  \"aktif\"\r\n             },\r\n    \"errors\":  [\r\n\r\n               ],\r\n    \"timestamp\":  \"2026-10-27T11:00:00+00:00\"\r\n}"
+                                      }
+                                  ]
+                 },
+                 {
+                     "name":  "POST - Data JSON tidak lengkap (422)",
+                     "event":  [
+                                   {
+                                       "listen":  "test",
+                                       "script":  {
+                                                      "type":  "text/javascript",
+                                                      "exec":  [
+                                                                   "pm.test(\u0027Status 422 Unprocessable Entity\u0027, function () { pm.response.to.have.status(422); });",
+                                                                   "pm.test(\u0027Response berisi rincian validasi\u0027, function () { const errors = pm.response.json().errors; pm.expect(errors).to.be.an(\u0027object\u0027); pm.expect(Object.keys(errors).length).to.be.above(0); });"
+                                                               ]
+                                                  }
+                                   }
+                               ],
+                     "request":  {
+                                     "method":  "POST",
+                                     "header":  [
+                                                    {
+                                                        "key":  "Content-Type",
+                                                        "value":  "application/json"
+                                                    }
+                                                ],
+                                     "body":  {
+                                                  "mode":  "raw",
+                                                  "raw":  "{\n  \"nim\": \"23016003\",\n  \"nama\": \"Dewi\"\n}",
+                                                  "options":  {
+                                                                  "raw":  {
+                                                                              "language":  "json"
+                                                                          }
+                                                              }
+                                              },
+                                     "url":  "{{base_url}}/api/mahasiswa",
+                                     "description":  "Controller: ApiMahasiswaController::store() — contoh validasi gagal karena field mahasiswa wajib tidak lengkap. Implementasi mengembalikan 422 Unprocessable Entity. Memerlukan Bearer JWT.",
+                                     "auth":  {
+                                                  "type":  "bearer",
+                                                  "bearer":  [
+                                                                 {
+                                                                     "key":  "token",
+                                                                     "value":  "{{jwt}}",
+                                                                     "type":  "string"
+                                                                 }
+                                                             ]
+                                              }
+                                 },
+                     "response":  [
+                                      {
+                                          "name":  "422 Unprocessable Entity - Field wajib belum lengkap",
+                                          "originalRequest":  {
+                                                                  "method":  "POST",
+                                                                  "header":  [
+                                                                                 {
+                                                                                     "key":  "Content-Type",
+                                                                                     "value":  "application/json"
+                                                                                 }
+                                                                             ],
+                                                                  "url":  "{{base_url}}/api/mahasiswa",
+                                                                  "body":  {
+                                                                               "mode":  "raw",
+                                                                               "raw":  "{\n  \"nim\": \"23016003\",\n  \"nama\": \"Dewi\"\n}",
+                                                                               "options":  {
+                                                                                               "raw":  {
+                                                                                                           "language":  "json"
+                                                                                                       }
+                                                                                           }
+                                                                           },
+                                                                  "auth":  {
+                                                                               "type":  "bearer",
+                                                                               "bearer":  [
+                                                                                              {
+                                                                                                  "key":  "token",
+                                                                                                  "value":  "{{jwt}}",
+                                                                                                  "type":  "string"
+                                                                                              }
+                                                                                          ]
+                                                                           }
+                                                              },
+                                          "status":  "Unprocessable Entity",
+                                          "code":  422,
+                                          "_postman_previewlanguage":  "json",
+                                          "header":  [
+                                                         {
+                                                             "key":  "Content-Type",
+                                                             "value":  "application/json; charset=utf-8"
+                                                         }
+                                                     ],
+                                          "body":  "{\r\n    \"success\":  false,\r\n    \"message\":  \"Data mahasiswa tidak valid.\",\r\n    \"data\":  null,\r\n    \"errors\":  {\r\n                   \"nim\":  [\r\n                               \"NIM wajib diisi, maksimal 20 karakter, dan harus berupa angka.\"\r\n                           ],\r\n                   \"email\":  [\r\n                                 \"Email wajib berupa alamat email yang valid (maksimal 100 karakter).\"\r\n                             ],\r\n                   \"prodi_id\":  [\r\n                                    \"Pilih program studi yang tersedia.\"\r\n                                ],\r\n                   \"angkatan\":  [\r\n                                    \"Angkatan harus berada antara 2000 dan 2155.\"\r\n                                ]\r\n               },\r\n    \"timestamp\":  \"2026-10-27T11:00:00+00:00\"\r\n}"
+                                      },
+                                      {
+                                          "name":  "201 Created - Data valid",
+                                          "originalRequest":  {
+                                                                  "method":  "POST",
+                                                                  "header":  [
+                                                                                 {
+                                                                                     "key":  "Content-Type",
+                                                                                     "value":  "application/json"
+                                                                                 }
+                                                                             ],
+                                                                  "url":  "{{base_url}}/api/mahasiswa",
+                                                                  "body":  {
+                                                                               "mode":  "raw",
+                                                                               "raw":  "{\n  \"nim\": \"23016003\",\n  \"nama\": \"Dewi\"\n}",
+                                                                               "options":  {
+                                                                                               "raw":  {
+                                                                                                           "language":  "json"
+                                                                                                       }
+                                                                                           }
+                                                                           },
+                                                                  "auth":  {
+                                                                               "type":  "bearer",
+                                                                               "bearer":  [
+                                                                                              {
+                                                                                                  "key":  "token",
+                                                                                                  "value":  "{{jwt}}",
+                                                                                                  "type":  "string"
+                                                                                              }
+                                                                                          ]
+                                                                           }
+                                                              },
+                                          "status":  "Created",
+                                          "code":  201,
+                                          "_postman_previewlanguage":  "json",
+                                          "header":  [
+                                                         {
+                                                             "key":  "Content-Type",
+                                                             "value":  "application/json; charset=utf-8"
+                                                         }
+                                                     ],
+                                          "body":  "{\r\n    \"success\":  true,\r\n    \"message\":  \"Data mahasiswa berhasil ditambahkan.\",\r\n    \"data\":  {\r\n                 \"id\":  1,\r\n                 \"nim\":  \"230160001\",\r\n                 \"nama\":  \"Dewi\",\r\n                 \"email\":  \"dewi@example.com\",\r\n                 \"prodi_id\":  1,\r\n                 \"angkatan\":  2023,\r\n                 \"status\":  \"aktif\"\r\n             },\r\n    \"errors\":  [\r\n\r\n               ],\r\n    \"timestamp\":  \"2026-10-27T11:00:00+00:00\"\r\n}"
+                                      }
+                                  ]
+                 },
+                 {
+                     "name":  "POST - Registrasi email tidak valid (422)",
+                     "event":  [
+                                   {
+                                       "listen":  "test",
+                                       "script":  {
+                                                      "type":  "text/javascript",
+                                                      "exec":  [
+                                                                   "pm.test(\u0027Status 422 Unprocessable Entity\u0027, function () { pm.response.to.have.status(422); });",
+                                                                   "pm.test(\u0027Registrasi ditolak\u0027, function () { pm.expect(pm.response.json().success).to.eql(false); });"
+                                                               ]
+                                                  }
+                                   }
+                               ],
+                     "request":  {
+                                     "method":  "POST",
+                                     "header":  [
+                                                    {
+                                                        "key":  "Content-Type",
+                                                        "value":  "application/json"
+                                                    }
+                                                ],
+                                     "body":  {
+                                                  "mode":  "raw",
+                                                  "raw":  "{\n  \"username\": \"user_email_invalid\",\n  \"email\": \"email-tidak-valid\",\n  \"password\": \"password123\"\n}",
+                                                  "options":  {
+                                                                  "raw":  {
+                                                                              "language":  "json"
+                                                                          }
+                                                              }
+                                              },
+                                     "url":  "{{base_url}}/register",
+                                     "description":  "Controller: AuthController::register() — contoh penolakan registrasi ketika format email tidak valid."
+                                 },
+                     "response":  [
+                                      {
+                                          "name":  "422 Unprocessable Entity - Email tidak valid",
+                                          "originalRequest":  {
+                                                                  "method":  "POST",
+                                                                  "header":  [
+                                                                                 {
+                                                                                     "key":  "Content-Type",
+                                                                                     "value":  "application/json"
+                                                                                 }
+                                                                             ],
+                                                                  "url":  "{{base_url}}/register",
+                                                                  "body":  {
+                                                                               "mode":  "raw",
+                                                                               "raw":  "{\n  \"username\": \"user_email_invalid\",\n  \"email\": \"email-tidak-valid\",\n  \"password\": \"password123\"\n}",
+                                                                               "options":  {
+                                                                                               "raw":  {
+                                                                                                           "language":  "json"
+                                                                                                       }
+                                                                                           }
+                                                                           }
+                                                              },
+                                          "status":  "Unprocessable Entity",
+                                          "code":  422,
+                                          "_postman_previewlanguage":  "json",
+                                          "header":  [
+                                                         {
+                                                             "key":  "Content-Type",
+                                                             "value":  "application/json; charset=utf-8"
+                                                         }
+                                                     ],
+                                          "body":  "{\r\n    \"success\":  false,\r\n    \"message\":  \"Email wajib berupa alamat email valid dan maksimal 100 karakter.\",\r\n    \"data\":  null,\r\n    \"errors\":  [\r\n\r\n               ],\r\n    \"timestamp\":  \"2026-10-27T11:00:00+00:00\"\r\n}"
+                                      },
+                                      {
+                                          "name":  "201 Created - Registrasi berhasil",
+                                          "originalRequest":  {
+                                                                  "method":  "POST",
+                                                                  "header":  [
+                                                                                 {
+                                                                                     "key":  "Content-Type",
+                                                                                     "value":  "application/json"
+                                                                                 }
+                                                                             ],
+                                                                  "url":  "{{base_url}}/register",
+                                                                  "body":  {
+                                                                               "mode":  "raw",
+                                                                               "raw":  "{\n  \"username\": \"user_email_invalid\",\n  \"email\": \"email-tidak-valid\",\n  \"password\": \"password123\"\n}",
+                                                                               "options":  {
+                                                                                               "raw":  {
+                                                                                                           "language":  "json"
+                                                                                                       }
+                                                                                           }
+                                                                           }
+                                                              },
+                                          "status":  "Created",
+                                          "code":  201,
+                                          "_postman_previewlanguage":  "json",
+                                          "header":  [
+                                                         {
+                                                             "key":  "Content-Type",
+                                                             "value":  "application/json; charset=utf-8"
+                                                         }
+                                                     ],
+                                          "body":  "{\r\n    \"success\":  true,\r\n    \"message\":  \"Registrasi berhasil.\",\r\n    \"data\":  {\r\n                 \"id\":  \"1\"\r\n             },\r\n    \"errors\":  [\r\n\r\n               ],\r\n    \"timestamp\":  \"2026-10-27T11:00:00+00:00\"\r\n}"
+                                      }
+                                  ]
+                 }
+             ]
+}

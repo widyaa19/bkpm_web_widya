@@ -1,0 +1,37 @@
+<form id="form-edit-mahasiswa" class="student-form" enctype="multipart/form-data" hidden>
+  <h3>Ubah mahasiswa</h3>
+  <input name="id" type="hidden">
+  <div class="student-form-grid">
+    <label>NIM<input name="nim" required maxlength="9" pattern="[0-9]{9}" inputmode="numeric"></label>
+    <label>Nama<input name="nama" required maxlength="100"></label>
+    <div class="photo-upload">
+      <label for="foto-edit-mahasiswa">Foto mahasiswa</label>
+      <input
+        id="foto-edit-mahasiswa"
+        name="foto"
+        type="file"
+        accept=".jpg,.jpeg,.png,image/jpeg,image/png"
+        aria-describedby="foto-edit-mahasiswa-help"
+      >
+      <small id="foto-edit-mahasiswa-help">JPG atau PNG, maksimal 2 MB. Kosongkan jika tidak ingin mengganti foto.</small>
+      <div class="photo-preview" data-photo-preview-container hidden>
+        <img data-photo-preview alt="" width="96" height="96">
+        <span data-photo-preview-label></span>
+      </div>
+    </div>
+    <label>Email<input name="email" type="email" required maxlength="100"></label>
+    <label>ID program studi<input name="prodi_id" type="number" min="1" required></label>
+    <label>Angkatan<input name="angkatan" type="number" min="1900" max="2155" required></label>
+    <label>Status
+      <select name="status" required>
+        <option value="aktif">Aktif</option>
+        <option value="cuti">Cuti</option>
+        <option value="lulus">Lulus</option>
+      </select>
+    </label>
+  </div>
+  <div class="student-form-actions">
+    <button class="dashboard-button" type="submit">Simpan perubahan</button>
+    <button class="dashboard-button dashboard-button-secondary" data-cancel-form type="button">Batal</button>
+  </div>
+</form>

@@ -1,0 +1,2 @@
+ALTER TABLE mahasiswa
+    ADD COLUMN foto VARCHAR(255) DEFAULT NULL AFTER prodi_id;

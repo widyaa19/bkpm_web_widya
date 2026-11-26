@@ -1,0 +1,349 @@
+{
+  "info": {
+    "_postman_id": "aa9258cc-72f6-4b9e-88eb-ebdb0718d6a4",
+    "name": "Hosted - API Sistem Informasi Akademik",
+    "description": "Collection untuk API di https://alwiyaa.my.id/Widya/public. Pilih environment 'Production' atau 'Hosted - alwiyaa.my.id'. Jalankan Register lalu Login untuk membuat/mendapatkan token. Register membuat role user; perubahan data mahasiswa membutuhkan token role admin, jadi isi username/password akun admin yang sudah disiapkan untuk pengujian CRUD mahasiswa. CRUD buku tidak membutuhkan token. POST/PUT/DELETE mahasiswa dan buku di collection ini hanya mengubah data uji; request POST menyimpan ID hasilnya untuk PUT dan DELETE.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "1 - Autentikasi",
+      "item": [
+        {
+          "name": "Register akun user tes",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const stamp = Date.now().toString();",
+                  "pm.environment.set('username', 'postman_' + stamp);",
+                  "pm.environment.set('email', 'postman_' + stamp + '@example.test');"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Registrasi berhasil (201)', function () { pm.response.to.have.status(201); });",
+                  "pm.test('Respons registrasi sukses', function () { pm.expect(pm.response.json().success).to.eql(true); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Accept", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"{{username}}\",\n  \"email\": \"{{email}}\",\n  \"password\": \"{{password}}\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": "{{base_url}}/register",
+            "description": "Membuat akun role user baru. Password diatur pada environment. Akun tersimpan di database hosting; jalankan hanya jika memang ingin membuat akun."
+          },
+          "response": []
+        },
+        {
+          "name": "Login dan simpan token",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const body = pm.response.json();",
+                  "pm.test('Login berhasil (200)', function () { pm.response.to.have.status(200); });",
+                  "pm.test('Token tersedia', function () { pm.expect(body.success).to.eql(true); pm.expect(body.data.token).to.be.a('string'); });",
+                  "if (body.success && body.data && body.data.token) pm.environment.set('token', body.data.token);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Accept", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"{{username}}\",\n  \"password\": \"{{password}}\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": "{{base_url}}/login",
+            "description": "Mengambil JWT dan menyimpannya ke environment variable token. Untuk CRUD mahasiswa gunakan akun yang memiliki role admin; token berlaku lima menit."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "2 - Mahasiswa",
+      "item": [
+        {
+          "name": "GET semua mahasiswa",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Daftar mahasiswa berhasil diambil (200)', function () { pm.response.to.have.status(200); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Accept", "value": "application/json" }],
+            "url": "{{base_url}}/api/mahasiswa",
+            "description": "Endpoint publik untuk mengambil seluruh mahasiswa."
+          },
+          "response": []
+        },
+        {
+          "name": "GET mahasiswa berdasarkan ID",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Accept", "value": "application/json" }],
+            "url": "{{base_url}}/api/mahasiswa/{{mahasiswa_id}}",
+            "description": "ID diambil dari environment variable mahasiswa_id (default 1)."
+          },
+          "response": []
+        },
+        {
+          "name": "POST mahasiswa (admin)",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.environment.set('test_nim', Date.now().toString().slice(-9));"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const body = pm.response.json();",
+                  "pm.test('Mahasiswa berhasil dibuat (201)', function () { pm.response.to.have.status(201); });",
+                  "if (body.success && body.data && body.data.id) pm.environment.set('created_mahasiswa_id', String(body.data.id));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Accept", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nim\": \"{{test_nim}}\",\n  \"nama\": \"Postman Hosted Test\",\n  \"email\": \"postman-{{test_nim}}@example.test\",\n  \"prodi_id\": {{prodi_id}},\n  \"angkatan\": 2026,\n  \"status\": \"aktif\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": "{{base_url}}/api/mahasiswa",
+            "auth": {
+              "type": "bearer",
+              "bearer": [{ "key": "token", "value": "{{token}}", "type": "string" }]
+            },
+            "description": "Memerlukan Bearer token dengan role admin. Jika menggunakan akun hasil Register akun user tes, server akan menolak dengan 403."
+          },
+          "response": []
+        },
+        {
+          "name": "PUT mahasiswa uji (admin)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Mahasiswa berhasil diperbarui (200)', function () { pm.response.to.have.status(200); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Accept", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nim\": \"{{test_nim}}\",\n  \"nama\": \"Postman Hosted Test Updated\",\n  \"email\": \"postman-{{test_nim}}@example.test\",\n  \"prodi_id\": {{prodi_id}},\n  \"angkatan\": 2026,\n  \"status\": \"aktif\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": "{{base_url}}/api/mahasiswa/{{created_mahasiswa_id}}",
+            "auth": {
+              "type": "bearer",
+              "bearer": [{ "key": "token", "value": "{{token}}", "type": "string" }]
+            },
+            "description": "Jalankan setelah POST mahasiswa (admin) berhasil."
+          },
+          "response": []
+        },
+        {
+          "name": "DELETE mahasiswa uji (admin)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Mahasiswa uji berhasil dihapus (200)', function () { pm.response.to.have.status(200); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [{ "key": "Accept", "value": "application/json" }],
+            "url": "{{base_url}}/api/mahasiswa/{{created_mahasiswa_id}}",
+            "auth": {
+              "type": "bearer",
+              "bearer": [{ "key": "token", "value": "{{token}}", "type": "string" }]
+            },
+            "description": "Jalankan setelah POST mahasiswa (admin) berhasil; hanya menghapus ID yang tersimpan dari POST tersebut."
+          },
+          "response": []
+        },
+        {
+          "name": "POST mahasiswa tanpa token (uji 401)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Request tanpa token ditolak (401)', function () { pm.response.to.have.status(401); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Accept", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nim\": \"269999999\",\n  \"nama\": \"Uji Tanpa Token\",\n  \"email\": \"tanpa-token@example.test\",\n  \"prodi_id\": {{prodi_id}},\n  \"angkatan\": 2026,\n  \"status\": \"aktif\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": "{{base_url}}/api/mahasiswa",
+            "auth": { "type": "noauth" },
+            "description": "Mengirim request tanpa token untuk menguji proteksi endpoint. Seharusnya tidak membuat data."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "3 - Buku (publik)",
+      "item": [
+        {
+          "name": "GET semua buku",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Accept", "value": "application/json" }],
+            "url": "{{base_url}}/api/buku",
+            "description": "Endpoint buku bersifat publik dan tidak membutuhkan token."
+          },
+          "response": []
+        },
+        {
+          "name": "GET buku berdasarkan ID",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Accept", "value": "application/json" }],
+            "url": "{{base_url}}/api/buku/{{buku_id}}",
+            "description": "ID diambil dari environment variable buku_id (default 1)."
+          },
+          "response": []
+        },
+        {
+          "name": "POST buku uji",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.environment.set('test_book_stamp', Date.now().toString());"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const body = pm.response.json();",
+                  "pm.test('Buku berhasil dibuat (201)', function () { pm.response.to.have.status(201); });",
+                  "if (body.success && body.data && body.data.id) pm.environment.set('created_buku_id', String(body.data.id));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Accept", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"judul\": \"Postman Hosted {{test_book_stamp}}\",\n  \"penulis\": \"Postman Test\",\n  \"penerbit\": \"Penerbit Uji\",\n  \"tahun_terbit\": 2026,\n  \"stok\": 1\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": "{{base_url}}/api/buku",
+            "description": "Membuat data buku uji tanpa autentikasi; ID hasilnya disimpan untuk request PUT dan DELETE."
+          },
+          "response": []
+        },
+        {
+          "name": "PUT buku uji",
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Accept", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"judul\": \"Postman Hosted Updated {{test_book_stamp}}\",\n  \"penulis\": \"Postman Test\",\n  \"penerbit\": \"Penerbit Uji\",\n  \"tahun_terbit\": 2026,\n  \"stok\": 2\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": "{{base_url}}/api/buku/{{created_buku_id}}",
+            "description": "Jalankan setelah POST buku uji berhasil."
+          },
+          "response": []
+        },
+        {
+          "name": "DELETE buku uji",
+          "request": {
+            "method": "DELETE",
+            "header": [{ "key": "Accept", "value": "application/json" }],
+            "url": "{{base_url}}/api/buku/{{created_buku_id}}",
+            "description": "Jalankan setelah POST buku uji berhasil; hanya menghapus ID yang tersimpan dari POST tersebut."
+          },
+          "response": []
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,277 @@
+{
+  "info": {
+    "_postman_id": "fe0f38e3-6521-4ae7-b6a0-3e5b7a5a0625",
+    "name": "Acara 28 - Login dan RBAC Mahasiswa",
+    "description": "Pilih environment Local - Acara 28. Register lalu login sebagai user untuk tes 403. Untuk tes admin, register akun admin, jalankan SQL `UPDATE users SET role = 'admin' WHERE username = '<username_admin dari environment>';`, lalu jalankan Login admin dan request CRUD admin. Dump SQL yang dilampirkan berisi mahasiswa ID 2 dan prodi ID 1, tetapi tidak memiliki akun admin; password akun existing hanya tersedia sebagai hash. JWT berlaku 5 menit.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "1 - Siapkan akun dan login",
+      "item": [
+        {
+          "name": "Register akun user tes",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const stamp = Date.now().toString();",
+                  "pm.environment.set('username_user', 'rbac_user_' + stamp);",
+                  "pm.environment.set('email_user', 'rbac_user_' + stamp + '@example.test');"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Akun user berhasil dibuat (201)', function () { pm.response.to.have.status(201); });",
+                  "pm.test('Respons registrasi sukses', function () { pm.expect(pm.response.json().success).to.eql(true); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Accept", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"{{username_user}}\",\n  \"email\": \"{{email_user}}\",\n  \"password\": \"{{test_password}}\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": "{{base_url}}/register",
+            "description": "Membuat akun role user baru agar pengujian tidak bergantung pada password hash dari dump database. Jalankan sebelum Login user."
+          },
+          "response": []
+        },
+        {
+          "name": "Login user dan simpan token",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const body = pm.response.json();",
+                  "pm.test('Login berhasil (200)', function () { pm.response.to.have.status(200); });",
+                  "pm.test('Role akun adalah user', function () { pm.expect(body.data.role).to.eql('user'); });",
+                  "if (body.success && body.data && body.data.role === 'user') pm.environment.set('token_user', body.data.token);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Accept", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"{{username_user}}\",\n  \"password\": \"{{test_password}}\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": "{{base_url}}/login",
+            "description": "AuthController::loginApi mengembalikan token dan role. Token user disimpan ke environment variable token_user."
+          },
+          "response": []
+        },
+        {
+          "name": "Register akun admin tes",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const stamp = Date.now().toString();",
+                  "pm.environment.set('username_admin', 'rbac_admin_' + stamp);",
+                  "pm.environment.set('email_admin', 'rbac_admin_' + stamp + '@example.test');"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Akun admin tes berhasil dibuat sebagai user awal (201)', function () { pm.response.to.have.status(201); });",
+                  "pm.test('Respons registrasi sukses', function () { pm.expect(pm.response.json().success).to.eql(true); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Accept", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"{{username_admin}}\",\n  \"email\": \"{{email_admin}}\",\n  \"password\": \"{{test_password}}\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": "{{base_url}}/register",
+            "description": "Registrasi selalu membuat role user. Setelah request ini, ubah role username_admin menjadi admin di database, lalu jalankan Login admin."
+          },
+          "response": []
+        },
+        {
+          "name": "Login admin dan simpan token",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const body = pm.response.json();",
+                  "pm.test('Login admin berhasil (200)', function () { pm.response.to.have.status(200); });",
+                  "pm.test('Role akun adalah admin', function () { pm.expect(body.data.role).to.eql('admin'); });",
+                  "if (body.success && body.data && body.data.role === 'admin') pm.environment.set('token_admin', body.data.token);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Accept", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"{{username_admin}}\",\n  \"password\": \"{{test_password}}\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": "{{base_url}}/login",
+            "description": "Jalankan setelah role akun username_admin dipromosikan di database. Token admin disimpan ke environment variable token_admin."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "2 - RBAC: user ditolak dan token wajib",
+      "item": [
+        {
+          "name": "POST mahasiswa sebagai user (403)",
+          "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": ["pm.test('User ditolak (403 Forbidden)', function () { pm.response.to.have.status(403); });", "pm.test('Respons menyatakan akses ditolak', function () { pm.expect(pm.response.json().message).to.include('admin'); });"] } }],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }, { "key": "Accept", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"nim\": \"269999991\",\n  \"nama\": \"RBAC User Test\",\n  \"email\": \"rbac-user-test@example.test\",\n  \"prodi_id\": 1,\n  \"angkatan\": 2026,\n  \"status\": \"aktif\"\n}", "options": { "raw": { "language": "json" } } },
+            "url": "{{base_url}}/api/mahasiswa",
+            "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token_user}}", "type": "string" }] },
+            "description": "Harus dijalankan setelah Login user. Endpoint tidak boleh membuat record untuk role user."
+          },
+          "response": []
+        },
+        {
+          "name": "PUT mahasiswa sebagai user (403)",
+          "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": ["pm.test('User ditolak (403 Forbidden)', function () { pm.response.to.have.status(403); });"] } }],
+          "request": {
+            "method": "PUT",
+            "header": [{ "key": "Content-Type", "value": "application/json" }, { "key": "Accept", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"nim\": \"2401002\",\n  \"nama\": \"Data Tidak Boleh Berubah\",\n  \"email\": \"ani@email.com\",\n  \"prodi_id\": 1,\n  \"angkatan\": 2024,\n  \"status\": \"aktif\"\n}", "options": { "raw": { "language": "json" } } },
+            "url": "{{base_url}}/api/mahasiswa/{{mahasiswa_id}}",
+            "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token_user}}", "type": "string" }] },
+            "description": "Menggunakan mahasiswa ID 2 dari dump. Pemeriksaan role berlangsung sebelum update."
+          },
+          "response": []
+        },
+        {
+          "name": "DELETE mahasiswa sebagai user (403)",
+          "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": ["pm.test('User ditolak (403 Forbidden)', function () { pm.response.to.have.status(403); });"] } }],
+          "request": {
+            "method": "DELETE",
+            "header": [{ "key": "Accept", "value": "application/json" }],
+            "url": "{{base_url}}/api/mahasiswa/{{mahasiswa_id}}",
+            "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token_user}}", "type": "string" }] },
+            "description": "ID mahasiswa tidak akan dihapus karena token ber-role user."
+          },
+          "response": []
+        },
+        {
+          "name": "POST mahasiswa tanpa token (401)",
+          "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": ["pm.test('Token tidak ada ditolak (401 Unauthorized)', function () { pm.response.to.have.status(401); });"] } }],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }, { "key": "Accept", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"nim\": \"269999992\",\n  \"nama\": \"No Token Test\",\n  \"email\": \"no-token@example.test\",\n  \"prodi_id\": 1,\n  \"angkatan\": 2026,\n  \"status\": \"aktif\"\n}", "options": { "raw": { "language": "json" } } },
+            "url": "{{base_url}}/api/mahasiswa",
+            "auth": { "type": "noauth" },
+            "description": "Memastikan request tanpa Authorization Bearer menerima 401."
+          },
+          "response": []
+        },
+        {
+          "name": "POST mahasiswa dengan token invalid (401)",
+          "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": ["pm.test('Token invalid ditolak (401 Unauthorized)', function () { pm.response.to.have.status(401); });"] } }],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }, { "key": "Accept", "value": "application/json" }, { "key": "Authorization", "value": "Bearer invalid.invalid.invalid" }],
+            "body": { "mode": "raw", "raw": "{\n  \"nim\": \"269999993\",\n  \"nama\": \"Invalid Token Test\",\n  \"email\": \"invalid-token@example.test\",\n  \"prodi_id\": 1,\n  \"angkatan\": 2026,\n  \"status\": \"aktif\"\n}", "options": { "raw": { "language": "json" } } },
+            "url": "{{base_url}}/api/mahasiswa",
+            "auth": { "type": "noauth" },
+            "description": "Memastikan Bearer token palsu menerima 401."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "3 - CRUD mahasiswa sebagai admin",
+      "description": "Jalankan Login admin terlebih dahulu setelah role akun admin disiapkan. Jalankan request secara berurutan: POST, PUT, lalu DELETE. Prodi ID 1 tersedia pada dump database.",
+      "item": [
+        {
+          "name": "POST mahasiswa sebagai admin (201)",
+          "event": [
+            { "listen": "prerequest", "script": { "type": "text/javascript", "exec": ["const nim = Date.now().toString().slice(-9);", "pm.environment.set('test_nim', nim);"] } },
+            { "listen": "test", "script": { "type": "text/javascript", "exec": ["const body = pm.response.json();", "pm.test('Admin dapat membuat mahasiswa (201)', function () { pm.response.to.have.status(201); });", "pm.test('ID mahasiswa hasil create tersimpan', function () { pm.expect(body.data.id).to.exist; pm.environment.set('created_mahasiswa_id', String(body.data.id)); });"] } }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }, { "key": "Accept", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"nim\": \"{{test_nim}}\",\n  \"nama\": \"Admin RBAC Test\",\n  \"email\": \"admin-rbac-{{test_nim}}@example.test\",\n  \"prodi_id\": 1,\n  \"angkatan\": 2026,\n  \"status\": \"aktif\"\n}", "options": { "raw": { "language": "json" } } },
+            "url": "{{base_url}}/api/mahasiswa",
+            "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token_admin}}", "type": "string" }] },
+            "description": "Membuat mahasiswa uji dengan NIM sembilan digit yang dibuat otomatis."
+          },
+          "response": []
+        },
+        {
+          "name": "PUT mahasiswa sebagai admin (200)",
+          "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": ["pm.test('Admin dapat mengubah mahasiswa (200)', function () { pm.response.to.have.status(200); });"] } }],
+          "request": {
+            "method": "PUT",
+            "header": [{ "key": "Content-Type", "value": "application/json" }, { "key": "Accept", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"nim\": \"{{test_nim}}\",\n  \"nama\": \"Admin RBAC Updated\",\n  \"email\": \"admin-rbac-{{test_nim}}@example.test\",\n  \"prodi_id\": 1,\n  \"angkatan\": 2026,\n  \"status\": \"aktif\"\n}", "options": { "raw": { "language": "json" } } },
+            "url": "{{base_url}}/api/mahasiswa/{{created_mahasiswa_id}}",
+            "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token_admin}}", "type": "string" }] },
+            "description": "Memperbarui record yang dibuat oleh request POST admin."
+          },
+          "response": []
+        },
+        {
+          "name": "DELETE mahasiswa sebagai admin (200)",
+          "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": ["pm.test('Admin dapat menghapus mahasiswa uji (200)', function () { pm.response.to.have.status(200); });"] } }],
+          "request": {
+            "method": "DELETE",
+            "header": [{ "key": "Accept", "value": "application/json" }],
+            "url": "{{base_url}}/api/mahasiswa/{{created_mahasiswa_id}}",
+            "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token_admin}}", "type": "string" }] },
+            "description": "Menghapus hanya record mahasiswa uji yang dibuat oleh request POST admin."
+          },
+          "response": []
+        }
+      ]
+    }
+  ]
+}
